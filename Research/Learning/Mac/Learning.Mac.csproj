@@ -77,6 +77,10 @@
   <ItemGroup>
     <InterfaceDefinition Include="MainMenu.xib" />
   </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="BokehParticleSystem.scnp" />
+    <BundleResource Include="bokeh.png" />
+  </ItemGroup>
   <Import Project="..\Shared\Learning.projitems" Label="Shared" Condition="Exists('..\Shared\Learning.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
 </Project>

@@ -24,7 +24,7 @@ namespace SpriteKitGame
             // Setup your scene here
             var myLabel = new SKLabelNode("Chalkduster")
             {
-                Text = "Hello, World!",
+                Text = "This fucking sucks",
                 FontSize = 50,
                 Position = new CGPoint(Frame.Width / 2, Frame.Height / 2)
             };
@@ -60,6 +60,7 @@ namespace SpriteKitGame
             var location = theEvent.LocationInNode(this);
 
             var sprite = SKSpriteNode.FromImageNamed(NSBundle.MainBundle.PathForResource("Spaceship", "png"));
+            //var sprite = SKSpriteNode.FromImageNamed(NSBundle.MainBundle.PathForResource("Spaceship", "png"));
 
             sprite.Position = location;
             sprite.SetScale(0.5f);
