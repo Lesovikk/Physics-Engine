@@ -24,7 +24,7 @@ namespace SpriteKitGame
             // Setup your scene here
             var myLabel = new SKLabelNode("Chalkduster")
             {
-                Text = "This fucking sucks",
+                Text = "This sucks",
                 FontSize = 50,
                 Position = new CGPoint(Frame.Width / 2, Frame.Height / 2)
             };
