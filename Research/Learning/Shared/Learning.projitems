@@ -10,7 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <BundleResource Include="$(MSBuildThisFileDirectory)Resources\GameScene.sks" />
-    <BundleResource Include="$(MSBuildThisFileDirectory)Resources\Spaceship.png" />
+    <BundleResource Include="$(MSBuildThisFileDirectory)Resources\person.png" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)GameViewController.cs" />
