@@ -14,7 +14,7 @@ namespace SpriteKitGame
 {
     public class GameScene : SKScene
     {
-        SKSpriteNode bg = SKSpriteNode.FromImageNamed("stars");
+        SKSpriteNode bg = SKSpriteNode.FromImageNamed("background");
 
         protected GameScene(IntPtr handle) : base(handle)
         {
@@ -31,7 +31,7 @@ namespace SpriteKitGame
                 Position = new CGPoint(Frame.Width / 2, Frame.Height / 2)
             };
 
-            BackgroundColor = NSColor.Blue;
+            //BackgroundColor = NSColor.Blue;
 
             bg.Position = new CGPoint(XScale = Frame.Size.Width / 2, YScale = Frame.Size.Height / 2);
             bg.Size = new CGSize(Frame.Size.Width, Frame.Size.Height);
@@ -67,18 +67,21 @@ namespace SpriteKitGame
 
             var location = theEvent.LocationInNode(this);
 
-            SKSpriteNode sprite = SKSpriteNode.FromImageNamed("logo");
+            SKSpriteNode sprite = SKSpriteNode.FromImageNamed("right_sprite");
             //var sprite = SKSpriteNode.FromImageNamed(NSBundle.MainBundle.PathForResource("Spaceship", "png"));
 
             sprite.Position = location;
-            sprite.SetScale(0.01f);
+            sprite.SetScale(50f);
 
             var action = SKAction.MoveBy(2, 2, 0.1);
+            //SKAction OutofBounds = SKAction.RemoveFromParent();
 
+            //sprite.
             sprite.RunAction(SKAction.RepeatActionForever(action));
-            //sprite.RunAction(SKAction.RepeatActionForever(action));
 
             AddChild(sprite);
+
+
         }
 #endif
 
