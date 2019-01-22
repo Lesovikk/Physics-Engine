@@ -15,6 +15,7 @@ namespace SpriteKitGame
     public class GameScene : SKScene
     {
         SKSpriteNode bg = SKSpriteNode.FromImageNamed("background");
+        SKSpriteNode player1 = SKSpriteNode.FromImageNamed("right_sprite");
 
         protected GameScene(IntPtr handle) : base(handle)
         {
@@ -26,10 +27,13 @@ namespace SpriteKitGame
             // Setup your scene here
             var myLabel = new SKLabelNode("ArialMT")
             {
-                Text = "*",
+                //Text = "*",
                 FontSize = 50,
                 Position = new CGPoint(Frame.Width / 2, Frame.Height / 2)
             };
+
+            player1.Position = new CGPoint(Frame.Width / 2, Frame.Height / 2);
+            player1.ZPosition = 1;
 
             //BackgroundColor = NSColor.Blue;
 
@@ -37,6 +41,7 @@ namespace SpriteKitGame
             bg.Size = new CGSize(Frame.Size.Width, Frame.Size.Height);
 
             AddChild(bg);
+            AddChild(player1);
             AddChild(myLabel);
         }
 
@@ -67,11 +72,11 @@ namespace SpriteKitGame
 
             var location = theEvent.LocationInNode(this);
 
-            SKSpriteNode sprite = SKSpriteNode.FromImageNamed("right_sprite");
+            SKSpriteNode sprite = SKSpriteNode.FromImageNamed("front_sprite");
             //var sprite = SKSpriteNode.FromImageNamed(NSBundle.MainBundle.PathForResource("Spaceship", "png"));
 
             sprite.Position = location;
-            sprite.SetScale(50f);
+            sprite.SetScale(1f);
 
             var action = SKAction.MoveBy(2, 2, 0.1);
             //SKAction OutofBounds = SKAction.RemoveFromParent();
