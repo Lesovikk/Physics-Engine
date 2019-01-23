@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Windows.Input;
 using CoreGraphics;
 using Foundation;
 using SpriteKit;
@@ -32,13 +32,14 @@ namespace SpriteKitGame
                 Position = new CGPoint(Frame.Width / 2, Frame.Height / 2)
             };
 
-            player1.Position = new CGPoint(Frame.Width / 2, Frame.Height / 2);
+            player1.Position = new CGPoint(Frame.Size.Width / 2, Frame.Size.Height / 2);
             player1.ZPosition = 1;
 
-            //BackgroundColor = NSColor.Blue;
+            BackgroundColor = NSColor.Black;
 
             bg.Position = new CGPoint(XScale = Frame.Size.Width / 2, YScale = Frame.Size.Height / 2);
-            bg.Size = new CGSize(Frame.Size.Width, Frame.Size.Height);
+            bg.Size = new CGSize(Frame.Size.Height, Frame.Size.Height);
+            player1.Size = new CGSize(Frame.Size.Height / 10, Frame.Size.Height / 10);
 
             AddChild(bg);
             AddChild(player1);
@@ -66,7 +67,7 @@ namespace SpriteKitGame
 			}
 		}
 #else
-        public override void MouseDown(NSEvent theEvent)
+        public override void KeyDown(NSEvent theEvent)
         {
             // Called when a mouse click occurs
 
