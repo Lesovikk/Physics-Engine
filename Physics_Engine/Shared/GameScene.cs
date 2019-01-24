@@ -4,11 +4,7 @@ using CoreGraphics;
 using Foundation;
 using SpriteKit;
 
-#if __IOS__
-using UIKit;
-#else
 using AppKit;
-#endif
 
 namespace SpriteKitGame
 {
@@ -32,7 +28,7 @@ namespace SpriteKitGame
                 Position = new CGPoint(Frame.Width / 2, Frame.Height / 2)
             };
 
-            player1.Position = new CGPoint(Frame.Size.Width / 2, Frame.Size.Height / 2);
+            player1.Position = new CGPoint(Frame.Size.Width / 2, 155*(Frame.Size.Height / 300));
             player1.ZPosition = 1;
 
             BackgroundColor = NSColor.Black;
@@ -46,30 +42,14 @@ namespace SpriteKitGame
             AddChild(myLabel);
         }
 
-#if __IOS__
-		public override void TouchesBegan (NSSet touches, UIEvent evt)
-		{
-			// Called when a touch begins
-			foreach (var touch in touches) {
-				var location = ((UITouch)touch).LocationInNode (this);
-
-				var sprite = new SKSpriteNode ("Spaceship") {
-					Position = location,
-					XScale = 0.5f,
-					YScale = 0.5f
-				};
-
-				var action = SKAction.RotateByAngle (NMath.PI, 1.0);
-
-				sprite.RunAction (SKAction.RepeatActionForever (action));
-
-				AddChild (sprite);
-			}
-		}
-#else
         public override void KeyDown(NSEvent theEvent)
         {
-            // Called when a mouse click occurs
+            base.KeyDown(theEvent);
+        }
+
+        public override void KeyUp(NSEvent theEvent)
+        {
+            // Called when a key is
 
             var location = theEvent.LocationInNode(this);
 
@@ -86,11 +66,7 @@ namespace SpriteKitGame
             sprite.RunAction(SKAction.RepeatActionForever(action));
 
             AddChild(sprite);
-
-
         }
-#endif
-
         public override void Update(double currentTime)
         {
             // Called before each frame is rendered
