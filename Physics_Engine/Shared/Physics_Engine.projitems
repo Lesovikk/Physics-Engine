@@ -10,10 +10,10 @@
   </PropertyGroup>
   <ItemGroup>
     <BundleResource Include="$(MSBuildThisFileDirectory)Resources\GameScene.sks" />
-    <BundleResource Include="$(MSBuildThisFileDirectory)Resources\front_sprite.png" />
-    <BundleResource Include="$(MSBuildThisFileDirectory)Resources\right_sprite.png" />
-    <BundleResource Include="$(MSBuildThisFileDirectory)Resources\left_sprite.png" />
-    <BundleResource Include="$(MSBuildThisFileDirectory)Resources\background.png" />
+    <BundleResource Include="$(MSBuildThisFileDirectory)Resources\sprites\player\front_sprite.png" />
+    <BundleResource Include="$(MSBuildThisFileDirectory)Resources\sprites\player\right_sprite.png" />
+    <BundleResource Include="$(MSBuildThisFileDirectory)Resources\sprites\player\left_sprite.png" />
+    <BundleResource Include="$(MSBuildThisFileDirectory)Resources\background\background.png" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)GameViewController.cs" />

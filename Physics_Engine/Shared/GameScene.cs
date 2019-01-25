@@ -3,7 +3,6 @@ using System.Windows.Input;
 using CoreGraphics;
 using Foundation;
 using SpriteKit;
-
 using AppKit;
 
 namespace SpriteKitGame
@@ -11,7 +10,7 @@ namespace SpriteKitGame
     public class GameScene : SKScene
     {
         SKSpriteNode bg = SKSpriteNode.FromImageNamed("background");
-        SKSpriteNode player1 = SKSpriteNode.FromImageNamed("right_sprite");
+        SKSpriteNode p1 = SKSpriteNode.FromImageNamed("right_sprite");
 
         protected GameScene(IntPtr handle) : base(handle)
         {
@@ -21,25 +20,17 @@ namespace SpriteKitGame
         public override void DidMoveToView(SKView view)
         {
             // Setup your scene here
-            var myLabel = new SKLabelNode("ArialMT")
-            {
-                //Text = "*",
-                FontSize = 50,
-                Position = new CGPoint(Frame.Width / 2, Frame.Height / 2)
-            };
-
-            player1.Position = new CGPoint(Frame.Size.Width / 2, 155*(Frame.Size.Height / 300));
-            player1.ZPosition = 1;
+            p1.Position = new CGPoint(Frame.Size.Width / 2, 155*(Frame.Size.Height / 300));
+            p1.ZPosition = 1;
 
             BackgroundColor = NSColor.Black;
 
             bg.Position = new CGPoint(XScale = Frame.Size.Width / 2, YScale = Frame.Size.Height / 2);
             bg.Size = new CGSize(Frame.Size.Height, Frame.Size.Height);
-            player1.Size = new CGSize(Frame.Size.Height / 10, Frame.Size.Height / 10);
+            p1.Size = new CGSize(Frame.Size.Height / 10, Frame.Size.Height / 10);
 
             AddChild(bg);
-            AddChild(player1);
-            AddChild(myLabel);
+            AddChild(p1);
         }
 
         public override void KeyDown(NSEvent theEvent)
