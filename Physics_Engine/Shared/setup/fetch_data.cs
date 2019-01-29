@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Windows.Input;
-using CoreGraphics;
-using Foundation;
-using SpriteKit;
-using AppKit;
+using System.IO;
 
 namespace Application
 {
@@ -34,10 +31,11 @@ namespace Application
 
     public class fetch
     {
-        string path_g = AppDomain.CurrentDomain.;
+        string location = Directory.GetCurrentDirectory();
+        string path_g = Directory.GetParent(location)+"/Resources/tables/";
         public fetchData(String ID)
         {
-            
+            path_g 
             return struct data;
         }
     }
