@@ -3,7 +3,6 @@ using SpriteKit;
 using Foundation;
 using AppKit;
 
-
 namespace SpriteKitGame
 {
     [Register("GameViewController")]

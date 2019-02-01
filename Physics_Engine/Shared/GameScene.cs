@@ -10,7 +10,7 @@ namespace SpriteKitGame
     public class GameScene : SKScene
     {
         SKSpriteNode bg = SKSpriteNode.FromImageNamed("background");
-        SKSpriteNode p1 = SKSpriteNode.FromImageNamed("right_sprite");
+        SKSpriteNode p1 = SKSpriteNode.FromImageNamed("p1right");
 
         protected GameScene(IntPtr handle) : base(handle)
         {
@@ -44,8 +44,8 @@ namespace SpriteKitGame
 
             var location = theEvent.LocationInNode(this);
 
-            SKSpriteNode sprite = SKSpriteNode.FromImageNamed("front_sprite");
-            //var sprite = SKSpriteNode.FromImageNamed(NSBundle.MainBundle.PathForResource("Spaceship", "png"));
+            //SKSpriteNode sprite = SKSpriteNode.FromImageNamed("p1front");
+            var sprite = SKSpriteNode.FromImageNamed(NSBundle.MainBundle.PathForResource("p1front", "png"));
 
             sprite.Position = location;
             sprite.SetScale(1f);
