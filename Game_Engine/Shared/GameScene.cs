@@ -65,8 +65,8 @@ namespace SpriteKitGame
 
             var location = theEvent.LocationInNode(this);
 
-            //SKSpriteNode sprite = SKSpriteNode.FromImageNamed("p1front");
-            var sprite = SKSpriteNode.FromImageNamed(NSBundle.MainBundle.PathForResource("p1front", "png"));
+            SKSpriteNode sprite = SKSpriteNode.FromImageNamed("p1front");
+            //var sprite = SKSpriteNode.FromImageNamed(NSBundle.MainBundle.PathForResource("p1front", "png"));
 
             sprite.Position = location;
             sprite.SetScale(1f);
