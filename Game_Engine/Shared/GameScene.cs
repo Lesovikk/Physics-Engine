@@ -3,7 +3,6 @@
 using CoreGraphics;
 using Foundation;
 using SpriteKit;
-
 #if __IOS__
 using UIKit;
 #else
@@ -14,8 +13,8 @@ namespace SpriteKitGame
 {
     public class GameScene : SKScene
     {
-        SKSpriteNode bg = SKSpriteNode.FromImageNamed("background");
-        SKSpriteNode p1 = SKSpriteNode.FromImageNamed("p1right");
+        SKSpriteNode bg = SKSpriteNode.FromImageNamed("background/background");
+        SKSpriteNode p1 = SKSpriteNode.FromImageNamed("sprites/player/p1right.png");
 
         protected GameScene(IntPtr handle) : base(handle)
         {
@@ -39,25 +38,27 @@ namespace SpriteKitGame
         }
 
 #if __IOS__
-		public override void TouchesBegan (NSSet touches, UIEvent evt)
-		{
-			// Called when a touch begins
-			foreach (var touch in touches) {
-				var location = ((UITouch)touch).LocationInNode (this);
+        public override void TouchesBegan(NSSet touches, UIEvent evt)
+        {
+            // Called when a touch begins
+            foreach (var touch in touches)
+            {
+                var location = ((UITouch)touch).LocationInNode(this);
 
-				var sprite = new SKSpriteNode ("Spaceship") {
-					Position = location,
-					XScale = 0.5f,
-					YScale = 0.5f
-				};
+                var sprite = new SKSpriteNode("Spaceship")
+                {
+                    Position = location,
+                    XScale = 0.5f,
+                    YScale = 0.5f
+                };
 
-				var action = SKAction.RotateByAngle (NMath.PI, 1.0);
+                var action = SKAction.RotateByAngle(NMath.PI, 1.0);
 
-				sprite.RunAction (SKAction.RepeatActionForever (action));
+                sprite.RunAction(SKAction.RepeatActionForever(action));
 
-				AddChild (sprite);
-			}
-		}
+                AddChild(sprite);
+            }
+        }
 #else
         public override void MouseDown(NSEvent theEvent)
         {
@@ -65,8 +66,8 @@ namespace SpriteKitGame
 
             var location = theEvent.LocationInNode(this);
 
-            SKSpriteNode sprite = SKSpriteNode.FromImageNamed("p1front");
-            //var sprite = SKSpriteNode.FromImageNamed(NSBundle.MainBundle.PathForResource("p1front", "png"));
+            //SKSpriteNode sprite = SKSpriteNode.FromImageNamed("p1front");
+            var sprite = SKSpriteNode.FromImageNamed(NSBundle.MainBundle.PathForResource("sprites/player/p1front", "png"));
 
             sprite.Position = location;
             sprite.SetScale(1f);
@@ -80,7 +81,6 @@ namespace SpriteKitGame
             AddChild(sprite);
         }
 #endif
-
         public override void Update(double currentTime)
         {
             // Called before each frame is rendered
