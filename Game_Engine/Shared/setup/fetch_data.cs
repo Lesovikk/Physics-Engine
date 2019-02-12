@@ -2,18 +2,25 @@
 using System.Windows.Input;
 using System.IO;
 using SpriteKit;
+using System.Diagnostics;
 
 namespace Game_Engine.setup
 {
     public abstract class Sprite
     {
+        //data from table
         public String ID;
         public String Name;
         public bool Solid;
         public String Type;
         public int defaultZ;
         public string path;
+
+        //game data
         SKSpriteNode spriteNode;
+        public int xPos;
+        public int yPos;
+        public int zPos;
 
         public class Entity : Sprite
         {
@@ -24,6 +31,15 @@ namespace Game_Engine.setup
             public string spriteb;
             public string spritel;
             public string spriter;
+
+            public Entity() { }
+
+            public Entity(Entity entity)
+            {
+                this.ID = entity.ID; this.Name = entity.Name; this.Solid = entity.Solid; this.Type = entity.Type; this.defaultZ = entity.defaultZ; this.path = entity.path;
+                this.Speed = entity.Speed; this.Health = entity.Health; this.Strength = entity.Strength; this.spritef = entity.spritef; this.spriteb = entity.spriteb;
+                this.spritel = entity.spritel; this.spriter = entity.spriter;
+            }
         }
 
         public class Block : Sprite
@@ -31,6 +47,14 @@ namespace Game_Engine.setup
             public bool Climbable;
             public int height;
             public bool Traversable;
+
+            public Block() { }
+
+            public Block(Block block)
+            {
+                this.ID = block.ID; this.Name = block.Name; this.Solid = block.Solid; this.Type = block.Type; this.defaultZ = block.defaultZ; this.path = block.path;
+                this.Climbable = block.Climbable; this.height = block.height; this.Traversable = block.Traversable;
+            }
         }
 
         public class Basic : Sprite
@@ -68,14 +92,23 @@ namespace Game_Engine.setup
         }
         */
         static string location = Directory.GetCurrentDirectory();
-        string path_g = Directory.GetParent(location) + "/Resources/tables/";
+        string path_g = Directory.GetParent(location).Parent.Parent.Parent.Parent.Parent + "/Shared/Resources/tables/";
 
         public Sprite Fetch(string ID, out Sprite.Entity fetch1, out Sprite.Block fetch2)
         {
-            StreamReader sprites = new StreamReader(path_g + "sprites.csv");
-            StreamReader entities = new StreamReader(path_g + "entities.csv");
-            StreamReader blocks = new StreamReader(path_g + "entities.csv");
-            Sprite.Basic temp = new Sprite.Basic();
+            Sprite.Basic temp=null; 
+            StreamReader sprites=null, entities=null, blocks=null;
+            try
+            {
+                sprites = new StreamReader(path_g + "sprites.csv");
+                entities = new StreamReader(path_g + "entities.csv");
+                blocks = new StreamReader(path_g + "entities.csv");
+                temp = new Sprite.Basic();
+            }
+            catch(Exception e)
+            {
+                Debug.WriteLine(e);
+            }
 
             bool found = false;
 
@@ -87,12 +120,11 @@ namespace Game_Engine.setup
                 { found = true; temp.ID = data[0]; temp.Name = data[1]; temp.Solid = bool.Parse(data[2]); temp.Type = data[3]; temp.defaultZ = int.Parse(data[4]); temp.path = data[5]; }
             }
             found = false;
-
             switch (temp.Type)
             {
                 case "entity":
                     fetch1 = new Sprite.Entity();
-                    fetch1.ID = temp.ID; fetch1.Name = temp.Name; fetch1.Solid = temp.Solid; fetch1.Type = temp.Type; fetch1.defaultZ = temp.defaultZ;
+                    fetch1.ID = temp.ID; fetch1.Name = temp.Name; fetch1.Solid = temp.Solid; fetch1.Type = temp.Type; fetch1.defaultZ = temp.defaultZ; fetch1.path = temp.path;
                     while (!found)
                     {
                         data = entities.ReadLine().Split(',');
@@ -104,7 +136,7 @@ namespace Game_Engine.setup
 
                 case "block":
                     fetch2 = new Sprite.Block();
-                    fetch2.ID = temp.ID; fetch2.Name = temp.Name; fetch2.Solid = temp.Solid; fetch2.Type = temp.Type; fetch2.defaultZ = temp.defaultZ;
+                    fetch2.ID = temp.ID; fetch2.Name = temp.Name; fetch2.Solid = temp.Solid; fetch2.Type = temp.Type; fetch2.defaultZ = temp.defaultZ; fetch2.path = temp.path;
                     while (!found)
                     {
                         data = blocks.ReadLine().Split(',');

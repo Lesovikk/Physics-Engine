@@ -3,6 +3,9 @@
 using CoreGraphics;
 using Foundation;
 using SpriteKit;
+using Game_Engine.setup;
+using AppKit;
+
 #if __IOS__
 using UIKit;
 #else
@@ -11,14 +14,30 @@ using AppKit;
 
 namespace SpriteKitGame
 {
+    public class Entity : Sprite.Entity
+    {
+        public Entity(Sprite.Entity se) : base(se)
+        { }
+    }
+    public class setup1 : p1_setup
+    { }
     public class GameScene : SKScene
     {
-        SKSpriteNode bg = SKSpriteNode.FromImageNamed("background/background");
-        SKSpriteNode p1 = SKSpriteNode.FromImageNamed("sprites/player/p1right.png");
+        setup1 fetch;
+        Entity player1;
+        SKSpriteNode bg;
+        SKSpriteNode p1;
 
         protected GameScene(IntPtr handle) : base(handle)
         {
-            // Note: this .ctor should not contain any initialization logic.
+            fetch = new setup1();
+            player1 = new Entity(fetch.p1());
+            //Sprite.Entity spe = fetch.p1();
+            //player1 = new Entity(spe);
+
+            bg = SKSpriteNode.FromImageNamed("background/background");
+            p1 = SKSpriteNode.FromImageNamed(player1.spritef);
+            //p1 = SKSpriteNode.FromImageNamed("sprites/player/p1front");
         }
 
         public override void DidMoveToView(SKView view)
@@ -63,7 +82,6 @@ namespace SpriteKitGame
         public override void MouseDown(NSEvent theEvent)
         {
             // Called when a mouse click occurs
-
             var location = theEvent.LocationInNode(this);
 
             //SKSpriteNode sprite = SKSpriteNode.FromImageNamed("p1front");
