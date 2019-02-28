@@ -14,6 +14,10 @@
     <BundleResource Include="$(MSBuildThisFileDirectory)Resources\sprites\player\p1back.png" />
     <BundleResource Include="$(MSBuildThisFileDirectory)Resources\sprites\player\p1left.png" />
     <BundleResource Include="$(MSBuildThisFileDirectory)Resources\sprites\player\p1right.png" />
+    <BundleResource Include="$(MSBuildThisFileDirectory)Resources\blocks\b1.png" />
+    <BundleResource Include="$(MSBuildThisFileDirectory)Resources\blocks\s1.png" />
+    <BundleResource Include="$(MSBuildThisFileDirectory)Resources\blocks\b2.png" />
+    <BundleResource Include="$(MSBuildThisFileDirectory)Resources\blocks\s2.png" />
     <BundleResource Include="$(MSBuildThisFileDirectory)Resources\background\background.png" />
   </ItemGroup>
   <ItemGroup>

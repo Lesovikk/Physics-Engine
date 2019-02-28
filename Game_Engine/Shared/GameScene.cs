@@ -4,7 +4,9 @@ using CoreGraphics;
 using Foundation;
 using SpriteKit;
 using Game_Engine.setup;
-using AppKit;
+using System.Windows.Input;
+using System.Diagnostics;
+
 
 #if __IOS__
 using UIKit;
@@ -14,46 +16,81 @@ using AppKit;
 
 namespace SpriteKitGame
 {
-    public class Entity : Sprite.Entity
-    {
-        public Entity(Sprite.Entity se) : base(se)
-        { }
-    }
     public class setup1 : p1_setup
     { }
     public class GameScene : SKScene
     {
         setup1 fetch;
-        Entity player1;
+        Sprite.Entity player1;
+        Sprite.Block block1;
+        Sprite.Block step1;
+        Sprite.Block block2;
+        Sprite.Block step2;
         SKSpriteNode bg;
-        SKSpriteNode p1;
+        Sprite[,] sprites;
+        nfloat Height;
+        nfloat Width;
+        int accelx;
+        int accely;
 
         protected GameScene(IntPtr handle) : base(handle)
         {
             fetch = new setup1();
-            player1 = new Entity(fetch.p1());
-            //Sprite.Entity spe = fetch.p1();
-            //player1 = new Entity(spe);
-
+            player1 = new Sprite.Entity(fetch.p1());
+            block1 = new Sprite.Block(fetch.b("b1"));
+            step1 = new Sprite.Block(fetch.b("s1"));
+            block2 = new Sprite.Block(fetch.b("b2"));
+            step2 = new Sprite.Block(fetch.b("s2"));
+            sprites = new Sprite[15, 15];
+            accelx = 0;
+            accely = 0;
+            Height = Frame.Size.Height;
+            Width = Frame.Size.Width;
             bg = SKSpriteNode.FromImageNamed("background/background");
-            p1 = SKSpriteNode.FromImageNamed(player1.spritef);
+            player1.spriteNode = SKSpriteNode.FromImageNamed(player1.spritef);
+            block1.spriteNode = SKSpriteNode.FromImageNamed(block1.path);
+            step1.spriteNode = SKSpriteNode.FromImageNamed(step1.path);
+            block2.spriteNode = SKSpriteNode.FromImageNamed(block2.path);
+            step2.spriteNode = SKSpriteNode.FromImageNamed(step2.path);
             //p1 = SKSpriteNode.FromImageNamed("sprites/player/p1front");
         }
 
         public override void DidMoveToView(SKView view)
         {
             // Setup your scene here
-            p1.Position = new CGPoint(Frame.Size.Width / 2, 155 * (Frame.Size.Height / 300));
-            p1.ZPosition = 1;
+
+            // test values for position
+            player1.xPos = 0; player1.yPos = 0;
+            block1.xPos = 8; block1.yPos = 9;
+            step1.xPos = 5; step1.yPos = 5;
+            block2.xPos = 9; block2.yPos = 8;
+            step2.xPos = 8; step2.yPos = 8;
+
+            fetch.setPos(ref player1, ref sprites, Height, Width);
+            fetch.setPos(ref block1, ref sprites, Height, Width);
+            fetch.setPos(ref step1, ref sprites, Height, Width);
+            fetch.setPos(ref block2, ref sprites, Height, Width);
+            fetch.setPos(ref step2, ref sprites, Height, Width);
+
+
+            player1.spriteNode.ZPosition = 1;
 
             BackgroundColor = NSColor.Black;
 
-            bg.Position = new CGPoint(XScale = Frame.Size.Width / 2, YScale = Frame.Size.Height / 2);
-            bg.Size = new CGSize(Frame.Size.Height, Frame.Size.Height);
-            p1.Size = new CGSize(Frame.Size.Height / 10, Frame.Size.Height / 10);
+            //bg.Position = new CGPoint(Height / 2, Width / 2);
+            bg.Position = new CGPoint(XScale = Frame.Width / 2, YScale = Frame.Height / 2);
+            bg.Size = new CGSize(Height, Height);
+            Debug.WriteLine("background: ");
+            Debug.WriteLine(bg.Size);
+            Debug.WriteLine(Frame.Size.Height);
+            //player1.spriteNode.Size = new CGSize(Frame.Size.Height / 10, Frame.Size.Height / 10);
 
             AddChild(bg);
-            AddChild(p1);
+            AddChild(player1.spriteNode);
+            AddChild(block1.spriteNode);
+            AddChild(step1.spriteNode);
+            AddChild(block2.spriteNode);
+            AddChild(step2.spriteNode);
         }
 
 #if __IOS__
@@ -79,25 +116,68 @@ namespace SpriteKitGame
             }
         }
 #else
-        public override void MouseDown(NSEvent theEvent)
+        public override void KeyDown(NSEvent theEvent)
         {
-            // Called when a mouse click occurs
+            // Called when a key is pressed
+            base.KeyDown(theEvent);
+
             var location = theEvent.LocationInNode(this);
+            var difference = new CGPoint(location.X-player1.spriteNode.Position.X, location.Y - player1.spriteNode.Position.Y);
+            var change = new CGPoint();
 
-            //SKSpriteNode sprite = SKSpriteNode.FromImageNamed("p1front");
-            var sprite = SKSpriteNode.FromImageNamed(NSBundle.MainBundle.PathForResource("sprites/player/p1front", "png"));
+            // Move around player1 and sets previous position to null
+            switch (Math.Abs(difference.X)>Math.Abs(difference.Y))
+            {
+                case true:
+                    if(difference.X>=0 && sprites[player1.xPos+1, player1.yPos] == null)
+                    { sprites[player1.xPos,player1.yPos] = null; player1.xPos++; change.X = Height / 10; }
+                    //else if(difference.X>=0 && sprites[player1.xPos, player1.x])
+                    else if(difference.X<0 && sprites[player1.xPos-1, player1.yPos]== null)
+                    { sprites[player1.xPos,player1.yPos] = null; player1.xPos--; change.X = -Height / 10; }
+                    break;
+                case false:
+                    if(difference.Y>=0 && sprites[player1.xPos, player1.yPos+1] == null)
+                    { sprites[player1.xPos,player1.yPos] = null; player1.yPos++; change.Y = Height / 10; }
+                    else if(difference.Y<0 && sprites[player1.xPos, player1.yPos-1]== null)
+                    { sprites[player1.xPos,player1.yPos] = null; player1.yPos--; change.Y = -Height / 10; }
+                    break;
+                default:
+                    break;
+            }
+            sprites[player1.xPos, player1.yPos] = player1;
+            // Debug
+            Debug.WriteLine("Player1 x: {0}, y: {1}", player1.xPos, player1.yPos);
+            for (int i = 9; i >= 0; i--)
+            {
+                Debug.Write("|");
+                for (int j = 0; j <= 9; j++)
+                {
+                    if (sprites[j, i] == player1)
+                    { Debug.Write("p|"); }
 
-            sprite.Position = location;
-            sprite.SetScale(1f);
+                    else if (sprites[j, i] == block1 || sprites[j,i] == block2 || sprites [j,i] == step1 || sprites[j,i] == step2)
+                    { Debug.Write("b|"); }
 
-            var action = SKAction.MoveBy(2, 2, 0.1);
+                    else
+                    { Debug.Write("0|"); }
+                }
+                Debug.WriteLine("");
+            }
+            var action = SKAction.MoveTo(new CGPoint(player1.spriteNode.Position.X + change.X, player1.spriteNode.Position.Y + change.Y), 0.5);
+            //var action = SKAction.MoveBy(change.X, change.Y, 0.5);
             //SKAction OutofBounds = SKAction.RemoveFromParent();
 
-            //sprite.
-            sprite.RunAction(SKAction.RepeatActionForever(action));
+            player1.spriteNode.RunAction(SKAction.RepeatActionForever(action));
 
-            AddChild(sprite);
+            //AddChild(sprite);
+
         }
+        /*
+        public void key_Press(object sender, KeyPressEventArgs e)
+        {
+
+        }
+        */       
 #endif
         public override void Update(double currentTime)
         {

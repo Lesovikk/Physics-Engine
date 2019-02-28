@@ -45,7 +45,8 @@ namespace SpriteKitGame
 
             // Create and configure the scene.
             var scene = SKNode.FromFile<GameScene>("GameScene");
-            scene.ScaleMode = SKSceneScaleMode.AspectFill;
+            //scene.ScaleMode = SKSceneScaleMode.AspectFill;
+            scene.ScaleMode = SKSceneScaleMode.AspectFit;
 
             // Present the scene.
             GameView.PresentScene(scene);
