@@ -1,6 +1,8 @@
 ﻿using System;
-using SpriteKit;
 using Foundation;
+using SpriteKit;
+
+#if !__IOS__
 using AppKit;
 
 namespace SpriteKitGame
@@ -35,4 +37,5 @@ namespace SpriteKitGame
         }
     }
 }
-
+#else
+#endif

@@ -1,5 +1,4 @@
 ﻿using System;
-
 using CoreGraphics;
 using Foundation;
 using SpriteKit;
@@ -7,12 +6,13 @@ using Game_Engine.setup;
 using System.Windows.Input;
 using System.Diagnostics;
 
-
 #if __IOS__
 using UIKit;
 #else
 using AppKit;
 #endif
+
+
 
 namespace SpriteKitGame
 {
@@ -20,6 +20,8 @@ namespace SpriteKitGame
     { }
     public class GameScene : SKScene
     {
+#if __IOS__
+#else
         setup1 fetch;
         Sprite.Entity player1;
         Sprite.Block block1;
@@ -27,23 +29,23 @@ namespace SpriteKitGame
         Sprite.Block block2;
         Sprite.Block step2;
         SKSpriteNode bg;
-        Sprite[,] sprites;
+        Sprite[,,] sprites;
         nfloat Height;
         nfloat Width;
-        int accelx;
-        int accely;
+        //int accelx;
+        //int accely;
 
         protected GameScene(IntPtr handle) : base(handle)
         {
             fetch = new setup1();
             player1 = new Sprite.Entity(fetch.p1());
-            block1 = new Sprite.Block(fetch.b("b1"));
+            block1  = new Sprite.Block(fetch.b("b1"));
             step1 = new Sprite.Block(fetch.b("s1"));
             block2 = new Sprite.Block(fetch.b("b2"));
             step2 = new Sprite.Block(fetch.b("s2"));
-            sprites = new Sprite[15, 15];
-            accelx = 0;
-            accely = 0;
+            sprites = new Sprite[10, 10, 3];
+            //accelx = 0;
+            //accely = 0;
             Height = Frame.Size.Height;
             Width = Frame.Size.Width;
             bg = SKSpriteNode.FromImageNamed("background/background");
@@ -60,11 +62,12 @@ namespace SpriteKitGame
             // Setup your scene here
 
             // test values for position
-            player1.xPos = 0; player1.yPos = 0;
-            block1.xPos = 8; block1.yPos = 9;
-            step1.xPos = 5; step1.yPos = 5;
-            block2.xPos = 9; block2.yPos = 8;
-            step2.xPos = 8; step2.yPos = 8;
+            player1.xPos = 0; player1.yPos = 0; player1.zPos = 0;
+            player1.spriteNode.ZPosition = 10;
+            block1.xPos = 5; block1.yPos = 6; block1.zPos = 0;
+            step1.xPos = 5; step1.yPos = 5; step1.zPos = 0;
+            block2.xPos = 6; block2.yPos = 7; block2.zPos = 0;
+            step2.xPos = 6; step2.yPos = 6; step2.zPos = 0;
 
             fetch.setPos(ref player1, ref sprites, Height, Width);
             fetch.setPos(ref block1, ref sprites, Height, Width);
@@ -92,6 +95,7 @@ namespace SpriteKitGame
             AddChild(block2.spriteNode);
             AddChild(step2.spriteNode);
         }
+#endif
 
 #if __IOS__
         public override void TouchesBegan(NSSet touches, UIEvent evt)
@@ -125,26 +129,9 @@ namespace SpriteKitGame
             var difference = new CGPoint(location.X-player1.spriteNode.Position.X, location.Y - player1.spriteNode.Position.Y);
             var change = new CGPoint();
 
-            // Move around player1 and sets previous position to null
-            switch (Math.Abs(difference.X)>Math.Abs(difference.Y))
-            {
-                case true:
-                    if(difference.X>=0 && sprites[player1.xPos+1, player1.yPos] == null)
-                    { sprites[player1.xPos,player1.yPos] = null; player1.xPos++; change.X = Height / 10; }
-                    //else if(difference.X>=0 && sprites[player1.xPos, player1.x])
-                    else if(difference.X<0 && sprites[player1.xPos-1, player1.yPos]== null)
-                    { sprites[player1.xPos,player1.yPos] = null; player1.xPos--; change.X = -Height / 10; }
-                    break;
-                case false:
-                    if(difference.Y>=0 && sprites[player1.xPos, player1.yPos+1] == null)
-                    { sprites[player1.xPos,player1.yPos] = null; player1.yPos++; change.Y = Height / 10; }
-                    else if(difference.Y<0 && sprites[player1.xPos, player1.yPos-1]== null)
-                    { sprites[player1.xPos,player1.yPos] = null; player1.yPos--; change.Y = -Height / 10; }
-                    break;
-                default:
-                    break;
-            }
-            sprites[player1.xPos, player1.yPos] = player1;
+            fetch.move(ref player1, ref sprites, difference, ref change, Height, Width);
+
+            sprites[player1.xPos, player1.yPos, player1.zPos] = player1;
             // Debug
             Debug.WriteLine("Player1 x: {0}, y: {1}", player1.xPos, player1.yPos);
             for (int i = 9; i >= 0; i--)
@@ -152,10 +139,10 @@ namespace SpriteKitGame
                 Debug.Write("|");
                 for (int j = 0; j <= 9; j++)
                 {
-                    if (sprites[j, i] == player1)
+                    if (sprites[j, i, player1.zPos] == player1)
                     { Debug.Write("p|"); }
 
-                    else if (sprites[j, i] == block1 || sprites[j,i] == block2 || sprites [j,i] == step1 || sprites[j,i] == step2)
+                    else if (sprites[j, i, player1.zPos] == block1 || sprites[j,i, player1.zPos] == block2 || sprites [j,i, player1.zPos] == step1 || sprites[j,i, player1.zPos] == step2)
                     { Debug.Write("b|"); }
 
                     else
@@ -163,6 +150,7 @@ namespace SpriteKitGame
                 }
                 Debug.WriteLine("");
             }
+
             var action = SKAction.MoveTo(new CGPoint(player1.spriteNode.Position.X + change.X, player1.spriteNode.Position.Y + change.Y), 0.5);
             //var action = SKAction.MoveBy(change.X, change.Y, 0.5);
             //SKAction OutofBounds = SKAction.RemoveFromParent();

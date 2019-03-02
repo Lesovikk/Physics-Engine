@@ -23,6 +23,10 @@ namespace Game_Engine.setup
         public int zPos;
         public double yShift;
         public double spriteh;
+        public virtual bool GetClimbable()
+        { return false; }
+        public virtual int GetHeight()
+        { return 0; }
 
         // Derived Entity class for monsters and player
         public class Entity : Sprite
@@ -58,6 +62,7 @@ namespace Game_Engine.setup
             public int height;
             public bool Traversable;
 
+            // Functions to set up a new instance of the Entity derived class
             public Block() { }
 
             public Block(Block block)
@@ -66,6 +71,11 @@ namespace Game_Engine.setup
                 this.yShift = block.yShift; this.spriteh = block.spriteh;
                 this.Climbable = block.Climbable; this.height = block.height; this.Traversable = block.Traversable;
             }
+
+            public override bool GetClimbable()
+            { return Climbable; }
+            public override int GetHeight()
+            { return height; }
         }
 
         // Basic class to help set up instances of the other derived classes
@@ -117,7 +127,7 @@ namespace Game_Engine.setup
             {
                 sprites = new StreamReader(path_g + "sprites.csv");
                 entities = new StreamReader(path_g + "entities.csv");
-                blocks = new StreamReader(path_g + "entities.csv");
+                blocks = new StreamReader(path_g + "blocks.csv");
                 temp = new Sprite.Basic();
             }
             catch(Exception e)
@@ -159,7 +169,7 @@ namespace Game_Engine.setup
                     {
                         data = blocks.ReadLine().Split(',');
                         if (data[0] == ID)
-                        { found = true; fetch2.Climbable = bool.Parse(data[1]); fetch2.height = int.Parse(data[2]); fetch2.Traversable = bool.Parse(data[3]); }
+                        { found = true; fetch2.Climbable = Convert.ToBoolean(int.Parse(data[1])); fetch2.height = int.Parse(data[2]); fetch2.Traversable = Convert.ToBoolean(int.Parse(data[3])); }
                     }
                     fetch1 = new Sprite.Entity();
                     return temp;

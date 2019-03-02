@@ -1,6 +1,6 @@
 ID,Climbable,height,Traversable
-b1,FALSE,1,TRUE
-b2,FALSE,2,TRUE
-s1,TRUE,1,TRUE
-s2,TRUE,2,TRUE
-r1,FALSE,1,FALSE
+b1,0,1,1
+b2,0,2,1
+s1,1,1,1
+s2,1,2,1
+r1,0,1,0

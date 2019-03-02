@@ -3,6 +3,7 @@ using System.Diagnostics;
 using SpriteKit;
 using System.Windows.Input;
 using CoreGraphics;
+using System.Windows.Forms;
 
 namespace Game_Engine.setup
 {
@@ -42,73 +43,150 @@ namespace Game_Engine.setup
             try
             {
                 fetch_Data.Fetch(ID, out Sprite.Entity e, out block);
+                Debug.WriteLine("No problems fetching: {0}", ID);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("p1_setup block setup");
-                Debug.WriteLine(ex);
+                Debug.WriteLine(ex + "\n");
             }
             return block;
         }
 
         // Sets the postition and height of an entity
-        public void setPos(ref Sprite.Entity sprite, ref Sprite[,] sprites, nfloat Height, nfloat Width)
+        public void setPos(ref Sprite.Entity sprite, ref Sprite[,,] sprites, nfloat Height, nfloat Width)
         {
             // XY positions have a value between 1 and 10
             sprite.spriteNode.Position = new CoreGraphics.CGPoint(((sprite.xPos + 0.5) * (Height / 10)) + (Width - Height) / 2, (sprite.yPos + sprite.yShift + 0.5) * (Height / 10));
             // Adds their postition to the sprite array
-            sprites[sprite.xPos, sprite.yPos] = sprite;
+            sprites[sprite.xPos, sprite.yPos, 0] = sprite;
             sprite.spriteNode.ZPosition = sprite.defaultZ;
-            sprite.spriteNode.Size = new CGSize(Height / 10, (Height*sprite.spriteh) / 150);
-            Debug.WriteLine("Check height");
-            Debug.WriteLine(sprite.spriteh);
+            sprite.spriteNode.Size = new CGSize(Height / 10, (Height * sprite.spriteh) / 150);
 
         }
 
         // Sets the position and height of a block
-        public void setPos(ref Sprite.Block sprite, ref Sprite[,] sprites, nfloat Height, nfloat Width)
+        public void setPos(ref Sprite.Block sprite, ref Sprite[,,] sprites, nfloat Height, nfloat Width)
         {
             // XY positions have a value between 1 and 10
             sprite.spriteNode.Position = new CoreGraphics.CGPoint(((sprite.xPos + 0.5) * (Height / 10)) + (Width - Height) / 2, (sprite.yPos + sprite.yShift + 0.5 + (sprite.spriteh - 15) / 30) * (Height / 10));
             // Adds their position to the sprite array
-            sprites[sprite.xPos, sprite.yPos] = sprite;
+            for (int i = 0; i < sprite.height; i++)
+            {
+                sprites[sprite.xPos, sprite.yPos, i] = sprite;
+            }
             sprite.spriteNode.ZPosition = sprite.defaultZ;
-            sprite.spriteNode.Size = new CGSize(Height / 10, (Height*sprite.spriteh) / 150);
+            sprite.spriteNode.Size = new CGSize(Height / 10, (Height * sprite.spriteh) / 150);
+            Debug.WriteLine("Name: {0}, Climbable: {1}", sprite.Name, sprite.Climbable);
             Debug.WriteLine(sprite.spriteNode.Position);
             Debug.WriteLine((sprite.yPos + sprite.yShift) * (Height / 10));
             Debug.WriteLine(sprite.spriteNode.Size);
         }
 
-        public void move(ref Sprite.Entity entity, ref Sprite.Entity[,] entities)
+        public string direction(CGPoint difference)
         {
-            string direction = "f";
-            switch (direction)
+            string Direction = "";
+            switch (Math.Abs(difference.X) >= Math.Abs(difference.Y))
             {
-                case "f":
-                    entity.yPos--;
+                case true:
+                    if (difference.X >= 0)
+                    { Direction = "right"; }
+                    else { Direction = "left"; }
                     break;
-                case "b":
-                    entity.yPos++;
-                    break;
-                case "l":
-                    entity.xPos--;
-                    break;
-                case "r":
-                    entity.xPos++;
+                case false:
+                    if (difference.Y >= 0)
+                    { Direction = "up"; }
+                    else { Direction = "down"; }
                     break;
                 default:
                     break;
             }
+            return Direction;
         }
 
-        public void movef(ref Sprite.Entity entity, ref Sprite.Entity[,] entities)
+        // Function that detects the key pressed
+        /*
+        private void Form1_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (entity.yPos == 10) { Debug.WriteLine("Can't move forward, max height reached"); }
-            else if (entities[entity.xPos,entity.yPos+1]==null)
+            if (e.KeyCode == Keys.F1 && e.Alt)
             {
-
+                //do something
             }
-            
+        }
+        */
+        // Function that performs the movement
+        public void movement(ref Sprite[,,] sprites, ref Sprite.Entity player1, string sprite, ref CGPoint change, nfloat unit, int i, int j)
+        {
+            // Change sprite
+            player1.spriteNode.Texture = SKTexture.FromImageNamed(sprite);
+
+            // Checks if move is out of bounds
+            if ((0 > player1.xPos + i | player1.xPos + i >= sprites.GetLength(0)) | (0 > player1.yPos + j | player1.yPos + j >= sprites.GetLength(1)))
+            {
+                Debug.WriteLine("Successfully prevented player from moving out of area");
+            }
+
+            // Moves player in the desired direction on the current floor
+            else if (sprites[player1.xPos + i, player1.yPos + j, player1.zPos] == null & (player1.zPos == 0 || sprites[player1.xPos + i, player1.yPos + j, player1.zPos - 1] != null))
+            {
+                sprites[player1.xPos, player1.yPos, player1.zPos] = null;
+                player1.xPos += i; change.X = i * unit;
+                player1.yPos += j; change.Y = j * unit;
+            }
+
+            // Moves a player in the desired direction and falls
+            else if (player1.zPos > 0 && sprites[player1.xPos + i, player1.yPos + j, player1.zPos - 1] == null)
+            {
+                sprites[player1.xPos, player1.yPos, player1.zPos] = null;
+                player1.xPos += i; player1.yPos += j;
+                change.X = i * unit; change.Y = j * unit;
+                while (player1.zPos > 0 && sprites[player1.xPos, player1.yPos, player1.zPos - 1] == null)
+                {
+                    player1.zPos--; player1.spriteNode.ZPosition--;
+                }
+            }
+
+            // Moves player 1 up a floor whilst moving in the desired direction
+            else if (sprites[player1.xPos + i, player1.yPos + j, player1.zPos].GetClimbable() && sprites[player1.xPos + i, player1.yPos + j, player1.zPos].GetHeight() - player1.zPos == 1)
+            {
+                sprites[player1.xPos, player1.yPos, player1.zPos] = null;
+                player1.spriteNode.ZPosition = sprites[player1.xPos + i, player1.yPos + j, player1.zPos].spriteNode.ZPosition + 1;
+                player1.xPos += i; change.X = i * unit;
+                player1.yPos += j; change.Y = j * unit;
+                player1.zPos++;
+            }
+        }
+
+        // Function to move the player character. 
+        public void move(ref Sprite.Entity player1, ref Sprite[,,] sprites, CGPoint difference, ref CGPoint change, nfloat Height, nfloat Width)
+        {
+            // find direction
+            string Direction = direction(difference);
+
+            // unit of travel
+            nfloat unit = Height / 10;
+
+            // Move around player1 and sets previous position to null
+            switch (Direction)
+            {
+                case "right":
+                    movement(ref sprites, ref player1, player1.spriter, ref change, unit, 1, 0);
+                    break;
+
+                case "left":
+                    movement(ref sprites, ref player1, player1.spritel, ref change, unit, -1, 0);
+                    break;
+
+                case "up":
+                    movement(ref sprites, ref player1, player1.spriteb, ref change, unit, 0, 1);
+                    break;
+
+                case "down":
+                    movement(ref sprites, ref player1, player1.spritef, ref change, unit, 0, -1);
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

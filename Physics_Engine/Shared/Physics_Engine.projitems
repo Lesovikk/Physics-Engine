@@ -15,12 +15,12 @@
     <BundleResource Include="$(MSBuildThisFileDirectory)Resources\sprites\player\p1left.png" />
     <BundleResource Include="$(MSBuildThisFileDirectory)Resources\sprites\player\p1right.png" />
     <BundleResource Include="$(MSBuildThisFileDirectory)Resources\background\background.png" />
+    <BundleResource Include="$(MSBuildThisFileDirectory)GameScene.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)GameViewController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameViewController.designer.cs">
       <DependentUpon>GameViewController.cs</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)GameScene.cs" />
   </ItemGroup>
 </Project>

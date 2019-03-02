@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Windows.Input;
+
 using CoreGraphics;
 using Foundation;
 using SpriteKit;
-using AppKit;
 
+#if !__IOS__
+using AppKit;
 namespace SpriteKitGame
 {
     public class GameScene : SKScene
@@ -65,3 +66,4 @@ namespace SpriteKitGame
     }
 }
 
+#endif
