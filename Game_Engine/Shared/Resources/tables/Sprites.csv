@@ -2,8 +2,8 @@ ID,Name,Solid,Type,defaultZ,path,yShift,sprite height
 p1,player,TRUE,entity,2,sprites/player/p1,0.01,15
 e1,enemy1,TRUE,entity,2,sprites/enemy/e1,0,15
 e2,enemy2,TRUE,entity,2,sprites/enemy/e2,0,15
-b1,block1,TRUE,block,2,blocks/b1,0,15
-b2,block2,TRUE,block,2,blocks/b2,0,19
-s1,staircase1,TRUE,block,2,blocks/s1,0,15
-s2,staircase2,TRUE,block,2,blocks/s2,0,19
+b1,block1,TRUE,block,2,blocks/b1,0,19
+b2,block2,TRUE,block,2,blocks/b2,0,23
+s1,staircase1,TRUE,block,2,blocks/s1,0,19
+s2,staircase2,TRUE,block,2,blocks/s2,0,23
 r1,rock1,TRUE,block,2,blocks/r1,0,15

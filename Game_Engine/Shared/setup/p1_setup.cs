@@ -4,6 +4,8 @@ using SpriteKit;
 using System.Windows.Input;
 using CoreGraphics;
 using System.Windows.Forms;
+#if !__IOS__
+using AppKit;
 
 namespace Game_Engine.setup
 {
@@ -59,8 +61,10 @@ namespace Game_Engine.setup
             // XY positions have a value between 1 and 10
             sprite.spriteNode.Position = new CoreGraphics.CGPoint(((sprite.xPos + 0.5) * (Height / 10)) + (Width - Height) / 2, (sprite.yPos + sprite.yShift + 0.5) * (Height / 10));
             // Adds their postition to the sprite array
+            sprite.actualX = sprite.xPos * 15 + 7.5;
+            sprite.actualY = sprite.yPos * 15 + 7.5;
             sprites[sprite.xPos, sprite.yPos, 0] = sprite;
-            sprite.spriteNode.ZPosition = sprite.defaultZ;
+            sprite.spriteNode.ZPosition = sprite.defaultZ + (9-sprite.yPos);
             sprite.spriteNode.Size = new CGSize(Height / 10, (Height * sprite.spriteh) / 150);
 
         }
@@ -68,35 +72,46 @@ namespace Game_Engine.setup
         // Sets the position and height of a block
         public void setPos(ref Sprite.Block sprite, ref Sprite[,,] sprites, nfloat Height, nfloat Width)
         {
-            // XY positions have a value between 1 and 10
-            sprite.spriteNode.Position = new CoreGraphics.CGPoint(((sprite.xPos + 0.5) * (Height / 10)) + (Width - Height) / 2, (sprite.yPos + sprite.yShift + 0.5 + (sprite.spriteh - 15) / 30) * (Height / 10));
-            // Adds their position to the sprite array
-            for (int i = 0; i < sprite.height; i++)
+            try
             {
-                sprites[sprite.xPos, sprite.yPos, i] = sprite;
+                // XY positions have a value between 1 and 10
+                sprite.spriteNode.Position = new CoreGraphics.CGPoint(((sprite.xPos + 0.5) * (Height / 10)) + (Width - Height) / 2, (sprite.yPos + sprite.yShift + 0.5 + (sprite.spriteh - 15) / 30) * (Height / 10));
+                // Adds their position to the sprite array
+                for (int i = 0; i < sprite.height; i++)
+                {
+                    sprites[sprite.xPos, sprite.yPos, i] = sprite;
+                }
+                sprite.spriteNode.ZPosition = sprite.defaultZ + (9 - sprite.yPos);
+                sprite.spriteNode.Size = new CGSize(Height / 10, (Height * sprite.spriteh) / 150);
+                Debug.WriteLine("no error setting position");
             }
-            sprite.spriteNode.ZPosition = sprite.defaultZ;
-            sprite.spriteNode.Size = new CGSize(Height / 10, (Height * sprite.spriteh) / 150);
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
+
             Debug.WriteLine("Name: {0}, Climbable: {1}", sprite.Name, sprite.Climbable);
             Debug.WriteLine(sprite.spriteNode.Position);
             Debug.WriteLine((sprite.yPos + sprite.yShift) * (Height / 10));
             Debug.WriteLine(sprite.spriteNode.Size);
         }
 
-        public string direction(CGPoint difference)
+        public string direction(NSEvent theEvent)
         {
             string Direction = "";
-            switch (Math.Abs(difference.X) >= Math.Abs(difference.Y))
+            switch (theEvent.KeyCode)
             {
-                case true:
-                    if (difference.X >= 0)
-                    { Direction = "right"; }
-                    else { Direction = "left"; }
+                case 13:
+                    Direction = "up";
                     break;
-                case false:
-                    if (difference.Y >= 0)
-                    { Direction = "up"; }
-                    else { Direction = "down"; }
+                case 0:
+                    Direction = "left";
+                    break;
+                case 1:
+                    Direction = "down";
+                    break;
+                case 2:
+                    Direction = "right";
                     break;
                 default:
                     break;
@@ -106,16 +121,17 @@ namespace Game_Engine.setup
 
         // Function that detects the key pressed
         /*
-        private void Form1_KeyPress(object sender, KeyPressEventArgs e)
+        public void Form1_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyCode == Keys.F1 && e.Alt)
+            if (e.KeyChar == 'w' || e.KeyChar == 'W')
             {
+                Debug.WriteLine("detected");
                 //do something
             }
         }
         */
         // Function that performs the movement
-        public void movement(ref Sprite[,,] sprites, ref Sprite.Entity player1, string sprite, ref CGPoint change, nfloat unit, int i, int j)
+        public void movement(ref Sprite[,,] sprites, ref Sprite.Entity player1, string sprite, ref CGPoint change, nfloat unit, int i, int j, nfloat Height, nfloat Width)
         {
             // Change sprite
             player1.spriteNode.Texture = SKTexture.FromImageNamed(sprite);
@@ -132,6 +148,7 @@ namespace Game_Engine.setup
                 sprites[player1.xPos, player1.yPos, player1.zPos] = null;
                 player1.xPos += i; change.X = i * unit;
                 player1.yPos += j; change.Y = j * unit;
+                if(player1.zPos>0) { player1.spriteNode.ZPosition = sprites[player1.xPos, player1.yPos, player1.zPos - 1].spriteNode.ZPosition + 2; }
             }
 
             // Moves a player in the desired direction and falls
@@ -142,15 +159,18 @@ namespace Game_Engine.setup
                 change.X = i * unit; change.Y = j * unit;
                 while (player1.zPos > 0 && sprites[player1.xPos, player1.yPos, player1.zPos - 1] == null)
                 {
-                    player1.zPos--; player1.spriteNode.ZPosition--;
+                    player1.zPos--; player1.spriteNode.Position = new CGPoint(player1.spriteNode.Position.X, player1.spriteNode.Position.Y - (4 * Height / 150));
                 }
+                if (player1.zPos > 0) { player1.spriteNode.ZPosition = sprites[player1.xPos, player1.yPos, player1.zPos - 1].spriteNode.ZPosition + 2; }
+                else { player1.spriteNode.ZPosition = player1.defaultZ + (9 - player1.yPos); }
             }
 
             // Moves player 1 up a floor whilst moving in the desired direction
             else if (sprites[player1.xPos + i, player1.yPos + j, player1.zPos].GetClimbable() && sprites[player1.xPos + i, player1.yPos + j, player1.zPos].GetHeight() - player1.zPos == 1)
             {
                 sprites[player1.xPos, player1.yPos, player1.zPos] = null;
-                player1.spriteNode.ZPosition = sprites[player1.xPos + i, player1.yPos + j, player1.zPos].spriteNode.ZPosition + 1;
+                player1.spriteNode.ZPosition = sprites[player1.xPos + i, player1.yPos + j, player1.zPos].spriteNode.ZPosition + 2;
+                player1.spriteNode.Position = new CGPoint(player1.spriteNode.Position.X, player1.spriteNode.Position.Y + (4 * Height / 150)); ;
                 player1.xPos += i; change.X = i * unit;
                 player1.yPos += j; change.Y = j * unit;
                 player1.zPos++;
@@ -158,10 +178,10 @@ namespace Game_Engine.setup
         }
 
         // Function to move the player character. 
-        public void move(ref Sprite.Entity player1, ref Sprite[,,] sprites, CGPoint difference, ref CGPoint change, nfloat Height, nfloat Width)
+        public void move(ref Sprite.Entity player1, ref Sprite[,,] sprites, NSEvent theEvent, ref CGPoint change, nfloat Height, nfloat Width)
         {
             // find direction
-            string Direction = direction(difference);
+            string Direction = direction(theEvent);
 
             // unit of travel
             nfloat unit = Height / 10;
@@ -170,19 +190,19 @@ namespace Game_Engine.setup
             switch (Direction)
             {
                 case "right":
-                    movement(ref sprites, ref player1, player1.spriter, ref change, unit, 1, 0);
+                    movement(ref sprites, ref player1, player1.spriter, ref change, unit, 1, 0, Height, Width);
                     break;
 
                 case "left":
-                    movement(ref sprites, ref player1, player1.spritel, ref change, unit, -1, 0);
+                    movement(ref sprites, ref player1, player1.spritel, ref change, unit, -1, 0, Height, Width);
                     break;
 
                 case "up":
-                    movement(ref sprites, ref player1, player1.spriteb, ref change, unit, 0, 1);
+                    movement(ref sprites, ref player1, player1.spriteb, ref change, unit, 0, 1, Height, Width);
                     break;
 
                 case "down":
-                    movement(ref sprites, ref player1, player1.spritef, ref change, unit, 0, -1);
+                    movement(ref sprites, ref player1, player1.spritef, ref change, unit, 0, -1, Height, Width);
                     break;
                 default:
                     break;
@@ -190,3 +210,4 @@ namespace Game_Engine.setup
         }
     }
 }
+#endif

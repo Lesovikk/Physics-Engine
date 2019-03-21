@@ -5,6 +5,7 @@ using SpriteKit;
 using Game_Engine.setup;
 using System.Windows.Input;
 using System.Diagnostics;
+using System.Windows.Forms;
 
 #if __IOS__
 using UIKit;
@@ -22,12 +23,10 @@ namespace SpriteKitGame
     {
 #if __IOS__
 #else
+        // Initialising instances of classes present in the game.
         setup1 fetch;
+        fetch_data data;
         Sprite.Entity player1;
-        Sprite.Block block1;
-        Sprite.Block step1;
-        Sprite.Block block2;
-        Sprite.Block step2;
         SKSpriteNode bg;
         Sprite[,,] sprites;
         nfloat Height;
@@ -38,22 +37,15 @@ namespace SpriteKitGame
         protected GameScene(IntPtr handle) : base(handle)
         {
             fetch = new setup1();
+            data = new fetch_data();
             player1 = new Sprite.Entity(fetch.p1());
-            block1  = new Sprite.Block(fetch.b("b1"));
-            step1 = new Sprite.Block(fetch.b("s1"));
-            block2 = new Sprite.Block(fetch.b("b2"));
-            step2 = new Sprite.Block(fetch.b("s2"));
             sprites = new Sprite[10, 10, 3];
             //accelx = 0;
             //accely = 0;
             Height = Frame.Size.Height;
             Width = Frame.Size.Width;
             bg = SKSpriteNode.FromImageNamed("background/background");
-            player1.spriteNode = SKSpriteNode.FromImageNamed(player1.spritef);
-            block1.spriteNode = SKSpriteNode.FromImageNamed(block1.path);
-            step1.spriteNode = SKSpriteNode.FromImageNamed(step1.path);
-            block2.spriteNode = SKSpriteNode.FromImageNamed(block2.path);
-            step2.spriteNode = SKSpriteNode.FromImageNamed(step2.path);
+            player1.spriteNode = SKSpriteNode.FromImageNamed(player1.spritef);          
             //p1 = SKSpriteNode.FromImageNamed("sprites/player/p1front");
         }
 
@@ -63,24 +55,16 @@ namespace SpriteKitGame
 
             // test values for position
             player1.xPos = 0; player1.yPos = 0; player1.zPos = 0;
-            player1.spriteNode.ZPosition = 10;
-            block1.xPos = 5; block1.yPos = 6; block1.zPos = 0;
-            step1.xPos = 5; step1.yPos = 5; step1.zPos = 0;
-            block2.xPos = 6; block2.yPos = 7; block2.zPos = 0;
-            step2.xPos = 6; step2.yPos = 6; step2.zPos = 0;
 
             fetch.setPos(ref player1, ref sprites, Height, Width);
-            fetch.setPos(ref block1, ref sprites, Height, Width);
-            fetch.setPos(ref step1, ref sprites, Height, Width);
-            fetch.setPos(ref block2, ref sprites, Height, Width);
-            fetch.setPos(ref step2, ref sprites, Height, Width);
 
+            // Fetches data from the stored map and implements it into the game
+            sprites = data.fetchMap(Height, Width);
 
             player1.spriteNode.ZPosition = 1;
 
             BackgroundColor = NSColor.Black;
 
-            //bg.Position = new CGPoint(Height / 2, Width / 2);
             bg.Position = new CGPoint(XScale = Frame.Width / 2, YScale = Frame.Height / 2);
             bg.Size = new CGSize(Height, Height);
             Debug.WriteLine("background: ");
@@ -90,10 +74,23 @@ namespace SpriteKitGame
 
             AddChild(bg);
             AddChild(player1.spriteNode);
+            for (int i = 0; i < 10; i++)
+            {
+                for (int j = 0; j < 10; j++)
+                {
+                    Debug.WriteLine(sprites[i, j, 0]);
+                    if(sprites[i,j,0]!=null)
+                    {
+                        AddChild(sprites[i, j, 0].spriteNode);
+                    }
+                }
+            }
+            /*
             AddChild(block1.spriteNode);
             AddChild(step1.spriteNode);
             AddChild(block2.spriteNode);
             AddChild(step2.spriteNode);
+            */
         }
 #endif
 
@@ -124,12 +121,10 @@ namespace SpriteKitGame
         {
             // Called when a key is pressed
             base.KeyDown(theEvent);
-
-            var location = theEvent.LocationInNode(this);
-            var difference = new CGPoint(location.X-player1.spriteNode.Position.X, location.Y - player1.spriteNode.Position.Y);
             var change = new CGPoint();
 
-            fetch.move(ref player1, ref sprites, difference, ref change, Height, Width);
+            fetch.move(ref player1, ref sprites, theEvent, ref change, Height, Width);
+            //fetch.Form1_KeyPress()
 
             sprites[player1.xPos, player1.yPos, player1.zPos] = player1;
             // Debug
@@ -139,14 +134,14 @@ namespace SpriteKitGame
                 Debug.Write("|");
                 for (int j = 0; j <= 9; j++)
                 {
-                    if (sprites[j, i, player1.zPos] == player1)
+                    if (sprites[j, i, player1.zPos] == null)
+                    { Debug.Write("0|"); }
+
+                    else if (sprites[j, i, player1.zPos] == player1)
                     { Debug.Write("p|"); }
 
-                    else if (sprites[j, i, player1.zPos] == block1 || sprites[j,i, player1.zPos] == block2 || sprites [j,i, player1.zPos] == step1 || sprites[j,i, player1.zPos] == step2)
+                    else if (sprites[j, i, player1.zPos].Type == "block")
                     { Debug.Write("b|"); }
-
-                    else
-                    { Debug.Write("0|"); }
                 }
                 Debug.WriteLine("");
             }
@@ -155,17 +150,10 @@ namespace SpriteKitGame
             //var action = SKAction.MoveBy(change.X, change.Y, 0.5);
             //SKAction OutofBounds = SKAction.RemoveFromParent();
 
-            player1.spriteNode.RunAction(SKAction.RepeatActionForever(action));
-
+            player1.spriteNode.RunAction(action);
             //AddChild(sprite);
 
         }
-        /*
-        public void key_Press(object sender, KeyPressEventArgs e)
-        {
-
-        }
-        */       
 #endif
         public override void Update(double currentTime)
         {

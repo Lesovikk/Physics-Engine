@@ -21,6 +21,9 @@ namespace Game_Engine.setup
         public int xPos;
         public int yPos;
         public int zPos;
+        public double actualX;
+        public double actualY;
+
         public double yShift;
         public double spriteh;
         public virtual bool GetClimbable()
@@ -61,10 +64,11 @@ namespace Game_Engine.setup
             public bool Climbable;
             public int height;
             public bool Traversable;
+            public bool Breakable;
+            public bool Moveable;
 
             // Functions to set up a new instance of the Entity derived class
             public Block() { }
-
             public Block(Block block)
             {
                 this.ID = block.ID; this.Name = block.Name; this.Solid = block.Solid; this.Type = block.Type; this.defaultZ = block.defaultZ; this.path = block.path;
@@ -181,6 +185,45 @@ namespace Game_Engine.setup
                     fetch2.ID = temp.ID; fetch2.Name = temp.Name; fetch2.Solid = temp.Solid; fetch2.Type = temp.Type; fetch2.defaultZ = temp.defaultZ;
                     return temp;
             }
+        }
+
+        string path_map = Directory.GetParent(location).Parent.Parent.Parent.Parent.Parent + "/Shared/Resources/maps/";
+
+        public Sprite[,,] fetchMap(nfloat Height, nfloat Width)
+        {
+            p1_setup setup = new p1_setup();
+            Sprite[,,] sprites = new Sprite[10,10,3];
+            StreamReader map1 = null;
+
+            try
+            {
+                map1 = new StreamReader(path_map + "map1.csv");
+                Debug.WriteLine("No error for map path");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
+
+            string[] row;
+
+            for (int y = 9; y >= 0; y--)
+            {
+                row = map1.ReadLine().Split(',');
+                for (int x = 0; x < row.Length; x++)
+                {
+                    if (row[x]!="0")
+                    {
+                        Sprite.Block block = new Sprite.Block(setup.b(row[x]));
+                        block.xPos = x; block.yPos = y; block.zPos = 0;
+                        block.spriteNode = SKSpriteNode.FromImageNamed(block.path);
+                        Debug.WriteLine("{0},{1}", Height, Width);
+                        setup.setPos(ref block, ref sprites, Height, Width);
+                    }
+                }
+            }
+
+            return sprites;
         }
     }
 }
