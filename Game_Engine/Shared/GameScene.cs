@@ -60,7 +60,6 @@ namespace SpriteKitGame
 
             // Fetches data from the stored map and implements it into the game
             sprites = data.fetchMap(Height, Width);
-
             player1.spriteNode.ZPosition = 1;
 
             BackgroundColor = NSColor.Black;

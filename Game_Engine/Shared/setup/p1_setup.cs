@@ -143,7 +143,7 @@ namespace Game_Engine.setup
             }
 
             // Moves player in the desired direction on the current floor
-            else if (sprites[player1.xPos + i, player1.yPos + j, player1.zPos] == null & (player1.zPos == 0 || sprites[player1.xPos + i, player1.yPos + j, player1.zPos - 1] != null))
+            else if ((sprites[player1.xPos + i, player1.yPos + j, player1.zPos] == null || !sprites[player1.xPos + i, player1.yPos + j, player1.zPos].Solid) & (player1.zPos == 0 || sprites[player1.xPos + i, player1.yPos + j, player1.zPos - 1] != null))
             {
                 sprites[player1.xPos, player1.yPos, player1.zPos] = null;
                 player1.xPos += i; change.X = i * unit;
