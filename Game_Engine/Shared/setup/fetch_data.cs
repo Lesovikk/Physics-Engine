@@ -2,6 +2,7 @@
 using System.IO;
 using SpriteKit;
 using System.Diagnostics;
+using CoreGraphics;
 
 namespace Game_Engine.setup
 {
@@ -35,8 +36,11 @@ namespace Game_Engine.setup
         public class Entity : Sprite
         {
             //Variable
-            public int Speed;
+            public double Speed;
+            public string last_direction;
+            public CGPoint destination;
             //Create on startup
+            public int Base_Speed;
             public int Max_Speed;
             public int Acceleration;
             public int Health;
@@ -53,7 +57,7 @@ namespace Game_Engine.setup
             {
                 this.ID = entity.ID; this.Name = entity.Name; this.Solid = entity.Solid; this.Type = entity.Type; this.defaultZ = entity.defaultZ; this.path = entity.path; 
                 this.yShift = entity.yShift; this.spriteh = entity.spriteh;
-                this.Max_Speed = entity.Max_Speed; this.Acceleration = entity.Acceleration; this.Health = entity.Health; this.Strength = entity.Strength; this.spritef = entity.spritef; 
+                this.Base_Speed = entity.Base_Speed; this.Max_Speed = entity.Max_Speed; this.Acceleration = entity.Acceleration; this.Health = entity.Health; this.Strength = entity.Strength; this.spritef = entity.spritef; 
                 this.spriteb = entity.spriteb; this.spritel = entity.spritel; this.spriter = entity.spriter;
             }
         }
@@ -161,7 +165,7 @@ namespace Game_Engine.setup
                     {
                         data = entities.ReadLine().Split(',');
                         if (data[0] == ID)
-                        { found = true; fetch1.Max_Speed = int.Parse(data[1]); fetch1.Acceleration=int.Parse(data[3]); fetch1.Health = int.Parse(data[2]); fetch1.Strength = int.Parse(data[3]); }
+                        { found = true; fetch1.Max_Speed = int.Parse(data[1]); fetch1.Base_Speed = int.Parse(data[2]); fetch1.Acceleration = int.Parse(data[3]); fetch1.Health = int.Parse(data[4]); fetch1.Strength = int.Parse(data[5]); }
                     }
                     fetch2 = new Sprite.Block();
                     return temp;

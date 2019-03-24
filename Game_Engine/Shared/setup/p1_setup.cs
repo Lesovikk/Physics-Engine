@@ -48,7 +48,8 @@ namespace Game_Engine.setup
             sprites[sprite.xPos, sprite.yPos, 0] = sprite;
             sprite.spriteNode.ZPosition = sprite.defaultZ + (9-sprite.yPos);
             sprite.spriteNode.Size = new CGSize(Height / 10, (Height * sprite.spriteh) / 150);
-
+            sprite.last_direction = "";
+            sprite.Speed = sprite.Base_Speed;
         }
     }
 }

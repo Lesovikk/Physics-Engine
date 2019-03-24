@@ -36,8 +36,7 @@ namespace SpriteKitGame
         nfloat Width;
         //int accelx;
         //int accely;
-        int x;
-        int y;
+
 
         protected GameScene(IntPtr handle) : base(handle)
         {
@@ -53,8 +52,6 @@ namespace SpriteKitGame
             bg = SKSpriteNode.FromImageNamed("background/background");
             player1.spriteNode = SKSpriteNode.FromImageNamed(player1.spritef);          
             //p1 = SKSpriteNode.FromImageNamed("sprites/player/p1front");
-            x = 0;
-            y = 0;
         }
 
         public override void DidMoveToView(SKView view)
@@ -63,7 +60,6 @@ namespace SpriteKitGame
 
             // test values for position
             player1.xPos = 0; player1.yPos = 0; player1.zPos = 0;
-
             fetch.setPos(ref player1, ref sprites, Height, Width);
 
             // Fetches data from the stored map and implements it into the game
@@ -130,7 +126,7 @@ namespace SpriteKitGame
             // Called when a key is pressed
             base.KeyDown(theEvent);
 
-            if(move.GetFlag())
+            if(GetFlag(player1))
             {
                 var change = new CGPoint();
 
@@ -157,13 +153,31 @@ namespace SpriteKitGame
                     Debug.WriteLine("");
                 }
 
-                var action = SKAction.MoveTo(new CGPoint(player1.spriteNode.Position.X + change.X, player1.spriteNode.Position.Y + change.Y), 0.5);
-
+                var action = SKAction.MoveTo(new CGPoint(player1.spriteNode.Position.X + change.X, player1.spriteNode.Position.Y + change.Y), 0.5 / (player1.Speed));
+                player1.destination = new CGPoint(player1.spriteNode.Position.X + change.X, player1.spriteNode.Position.Y + change.Y);
+                var sequence = SKAction.Sequence(action);
                 //var action = SKAction.MoveBy(change.X, change.Y, 0.5);
                 //SKAction OutofBounds = SKAction.RemoveFromParent();
                 player1.spriteNode.RunAction(action);
             }
             //AddChild(sprite);
+        }
+
+        public bool GetFlag(Sprite.Entity entity)
+        {
+            if(!entity.spriteNode.HasActions)
+            {
+                return true;
+            }
+            else { return false; }
+        }
+        public bool GetNear(Sprite.Entity entity)
+        {
+            if (Math.Sqrt(Math.Pow(player1.spriteNode.Position.X - player1.destination.X, 2)) <= 0.1 && (player1.last_direction == "left" || player1.last_direction == "right"))
+                { return true; }
+            else if (Math.Sqrt(Math.Pow(player1.spriteNode.Position.Y - player1.destination.Y, 2)) <= 0.1 && (player1.last_direction == "up" || player1.last_direction == "down"))
+                { return true; }
+            else { return false; }
         }
 #endif
         public override void Update(double currentTime)

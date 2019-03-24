@@ -1,5 +1,5 @@
 ID,Name,Solid,Type,defaultZ,path,yShift,sprite height
-p1,player,TRUE,entity,2,sprites/player/p1,0.01,15
+p1,player,TRUE,entity,2,sprites/player/p1,0.2,15
 e1,enemy1,TRUE,entity,2,sprites/enemy/e1,0,15
 e2,enemy2,TRUE,entity,2,sprites/enemy/e2,0,15
 b1,block1,TRUE,block,2,blocks/b1,0,19

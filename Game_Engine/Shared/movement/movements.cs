@@ -58,28 +58,32 @@ namespace Game_Engine.movement
         {
             // Change sprite
             player1.spriteNode.Texture = SKTexture.FromImageNamed(sprite);
-
+            int x = (int)((player1.actualX + i * 4) / 15);
+            int y = (int)((player1.actualY + j * 4) / 15);
+            Debug.WriteLine("{0},{1}", player1.actualX, player1.actualY);
+            Debug.WriteLine("{0},{1}", x, y);
+            sprites[player1.xPos, player1.yPos, player1.zPos] = null;
             // Checks if move is out of bounds
-            if ((0 > player1.xPos + i | player1.xPos + i >= sprites.GetLength(0)) | (0 > player1.yPos + j | player1.yPos + j >= sprites.GetLength(1)))
+            if ((0 > player1.actualX + 4 * i | player1.actualX + 4 * i >= 15 * sprites.GetLength(0)) | (0 > player1.actualY + 4 * j | player1.actualY + 4 * j >= 15 * sprites.GetLength(1)))
             {
                 Debug.WriteLine("Successfully prevented player from moving out of area");
             }
 
             // Moves player in the desired direction on the current floor
-            else if ((sprites[player1.xPos + i, player1.yPos + j, player1.zPos] == null || !sprites[player1.xPos + i, player1.yPos + j, player1.zPos].Solid) & (player1.zPos == 0 || sprites[player1.xPos + i, player1.yPos + j, player1.zPos - 1] != null))
+            else if ((sprites[x, y, player1.zPos] == null || !sprites[x, y, player1.zPos].Solid) & (player1.zPos == 0 || sprites[x, y, player1.zPos - 1] != null))
             {
-                sprites[player1.xPos, player1.yPos, player1.zPos] = null;
-                player1.xPos += i; change.X = i * unit;
-                player1.yPos += j; change.Y = j * unit;
+                Debug.WriteLine("Moved in desired direction");
+                player1.actualX += 3.75*i; player1.xPos = (int)(player1.actualX / 15); change.X = i * unit;
+                player1.actualY += 3.75*j; player1.yPos = (int)(player1.actualY / 15); change.Y = j * unit;
                 if (player1.zPos > 0) { player1.spriteNode.ZPosition = sprites[player1.xPos, player1.yPos, player1.zPos - 1].spriteNode.ZPosition + 2; }
             }
 
             // Moves a player in the desired direction and falls
             else if (player1.zPos > 0 && sprites[player1.xPos + i, player1.yPos + j, player1.zPos - 1] == null)
             {
-                sprites[player1.xPos, player1.yPos, player1.zPos] = null;
-                player1.xPos += i; player1.yPos += j;
-                change.X = i * unit; change.Y = j * unit;
+                Debug.WriteLine("Moved in desired direction and fell");
+                player1.actualX += 3.75 * i; player1.xPos = (int)(player1.actualX / 15); change.X = i * unit;
+                player1.actualY += 3.75 * j; player1.yPos = (int)(player1.actualY / 15); change.Y = j * unit;
                 while (player1.zPos > 0 && sprites[player1.xPos, player1.yPos, player1.zPos - 1] == null)
                 {
                     player1.zPos--; player1.spriteNode.Position = new CGPoint(player1.spriteNode.Position.X, player1.spriteNode.Position.Y - (4 * Height / 150));
@@ -89,15 +93,16 @@ namespace Game_Engine.movement
             }
 
             // Moves player 1 up a floor whilst moving in the desired direction
-            else if (sprites[player1.xPos + i, player1.yPos + j, player1.zPos].GetClimbable() && sprites[player1.xPos + i, player1.yPos + j, player1.zPos].GetHeight() - player1.zPos == 1)
+            else if (sprites[x, y, player1.zPos].GetClimbable() && sprites[x, y, player1.zPos].GetHeight() - player1.zPos == 1)
             {
-                sprites[player1.xPos, player1.yPos, player1.zPos] = null;
+                Debug.WriteLine("Moved in desired direction and climbed");
                 player1.spriteNode.ZPosition = sprites[player1.xPos + i, player1.yPos + j, player1.zPos].spriteNode.ZPosition + 2;
                 player1.spriteNode.Position = new CGPoint(player1.spriteNode.Position.X, player1.spriteNode.Position.Y + (4 * Height / 150)); ;
-                player1.xPos += i; change.X = i * unit;
-                player1.yPos += j; change.Y = j * unit;
+                player1.actualX += 3.75 * 2 * i; player1.xPos = (int)(player1.actualX / 15); change.X = 2 * i * unit;
+                player1.actualY += 3.75 * 2 * j; player1.yPos = (int)(player1.actualY / 15); change.Y = 2 * j * unit;
                 player1.zPos++;
             }
+            else { Debug.WriteLine("Error"); }
         }
 
         // Function to move the player character. 
@@ -107,8 +112,20 @@ namespace Game_Engine.movement
             string Direction = direction(theEvent);
 
             // unit of travel
-            nfloat unit = Height / 10;
+            nfloat unit = (nfloat)(3.75 * Height / 150);
 
+            // Acceleration
+            Debug.WriteLine("Prev.Speed: {0}", player1.Speed);
+            Debug.WriteLine("Max Speed: {0}", player1.Max_Speed);
+            Debug.WriteLine("{0},{1},{2}", player1.last_direction, Direction, player1.last_direction == Direction);
+            if (player1.last_direction == Direction && player1.Speed<=player1.Max_Speed)
+            {
+                player1.Speed += 0.1 * (double)(player1.Acceleration);
+                player1.last_direction = Direction;
+            }
+            else if(player1.last_direction!=Direction){ player1.Speed = player1.Base_Speed; player1.last_direction = Direction; }
+
+            Debug.WriteLine("Speed: {0}",player1.Speed);
             // Move around player1 and sets previous position to null
             switch (Direction)
             {

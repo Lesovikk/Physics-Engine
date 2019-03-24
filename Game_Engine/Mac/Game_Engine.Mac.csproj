@@ -83,6 +83,38 @@
   <ItemGroup>
     <InterfaceDefinition Include="MainMenu.xib" />
   </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\maps\map1.csv" />
+    <BundleResource Include="Resources\maps\map1.xlsx" />
+    <BundleResource Include="Resources\blocks\b1.clip" />
+    <BundleResource Include="Resources\blocks\b1.png" />
+    <BundleResource Include="Resources\blocks\b2.clip" />
+    <BundleResource Include="Resources\blocks\b2.png" />
+    <BundleResource Include="Resources\blocks\s1.clip" />
+    <BundleResource Include="Resources\blocks\s1.png" />
+    <BundleResource Include="Resources\blocks\s2.clip" />
+    <BundleResource Include="Resources\blocks\s2.png" />
+    <BundleResource Include="Resources\background\.DS_Store" />
+    <BundleResource Include="Resources\background\background.clip" />
+    <BundleResource Include="Resources\background\background.png" />
+    <BundleResource Include="Resources\tables\.DS_Store" />
+    <BundleResource Include="Resources\tables\Sprites.csv" />
+    <BundleResource Include="Resources\tables\Sprites.xlsx" />
+    <BundleResource Include="Resources\tables\blocks.csv" />
+    <BundleResource Include="Resources\tables\blocks.xlsx" />
+    <BundleResource Include="Resources\tables\entities.csv" />
+    <BundleResource Include="Resources\tables\entities.xlsx" />
+    <BundleResource Include="Resources\sprites\.DS_Store" />
+    <BundleResource Include="Resources\sprites\player\.DS_Store" />
+    <BundleResource Include="Resources\sprites\player\p1back.clip" />
+    <BundleResource Include="Resources\sprites\player\p1back.png" />
+    <BundleResource Include="Resources\sprites\player\p1front.clip" />
+    <BundleResource Include="Resources\sprites\player\p1front.png" />
+    <BundleResource Include="Resources\sprites\player\p1left.clip" />
+    <BundleResource Include="Resources\sprites\player\p1left.png" />
+    <BundleResource Include="Resources\sprites\player\p1right.clip" />
+    <BundleResource Include="Resources\sprites\player\p1right.png" />
+  </ItemGroup>
   <Import Project="..\Shared\Game_Engine.projitems" Label="Shared" Condition="Exists('..\Shared\Game_Engine.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
 </Project>
