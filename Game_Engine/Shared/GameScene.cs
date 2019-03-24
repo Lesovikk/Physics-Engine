@@ -121,14 +121,14 @@ namespace SpriteKitGame
         {
             // Called when a key is pressed
             base.KeyDown(theEvent);
-            var change = new CGPoint();
+            //var change = new CGPoint();
 
             sprites[player1.xPos, player1.yPos, player1.zPos] = null;
             player1.xPos = Convert.ToInt32((player1.spriteNode.Position.X - (Width - Height) / 2) / (Height / 10));
             player1.yPos = Convert.ToInt32(player1.spriteNode.Position.Y / (Height / 10));
             sprites[player1.xPos, player1.yPos, player1.zPos] = player1;
 
-            move.move(ref player1, ref sprites, theEvent, ref change, Height, Width);
+            move.move(ref player1, ref sprites, theEvent, Height, Width);
             //fetch.Form1_KeyPress()
 
             sprites[player1.xPos, player1.yPos, player1.zPos] = player1;
@@ -151,11 +151,11 @@ namespace SpriteKitGame
                 Debug.WriteLine("");
             }
 
-            var action = SKAction.MoveTo(new CGPoint(player1.spriteNode.Position.X + change.X, player1.spriteNode.Position.Y + change.Y), 0.5);
+            //var action = SKAction.MoveTo(new CGPoint(player1.spriteNode.Position.X + change.X, player1.spriteNode.Position.Y + change.Y), 0.5);
 
             //var action = SKAction.MoveBy(change.X, change.Y, 0.5);
             //SKAction OutofBounds = SKAction.RemoveFromParent();
-            player1.spriteNode.RunAction(action);
+            //player1.spriteNode.RunAction(action);
         }
 #endif
         public override void Update(double currentTime)
