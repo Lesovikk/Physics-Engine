@@ -19,14 +19,16 @@ using AppKit;
 
 namespace SpriteKitGame
 {
+    public class setup1 : p1_setup
+    { }
     public class GameScene : SKScene
     {
 #if __IOS__
 #else
         // Initialising instances of classes present in the game.
-        p1_setup fetchp1;
-        movements move;
+        setup1 fetch;
         fetch_data data;
+        movements move;
         Sprite.Entity player1;
         SKSpriteNode bg;
         Sprite[,,] sprites;
@@ -39,17 +41,17 @@ namespace SpriteKitGame
 
         protected GameScene(IntPtr handle) : base(handle)
         {
-            fetchp1 = new p1_setup();
-            move = new movements();
+            fetch = new setup1();
             data = new fetch_data();
-            player1 = new Sprite.Entity(fetchp1.p1());
+            move = new movements();
+            player1 = new Sprite.Entity(fetch.p1());
             sprites = new Sprite[10, 10, 3];
             //accelx = 0;
             //accely = 0;
             Height = Frame.Size.Height;
             Width = Frame.Size.Width;
             bg = SKSpriteNode.FromImageNamed("background/background");
-            player1.spriteNode = SKSpriteNode.FromImageNamed(player1.spritef);
+            player1.spriteNode = SKSpriteNode.FromImageNamed(player1.spritef);          
             //p1 = SKSpriteNode.FromImageNamed("sprites/player/p1front");
             x = 0;
             y = 0;
@@ -62,7 +64,7 @@ namespace SpriteKitGame
             // test values for position
             player1.xPos = 0; player1.yPos = 0; player1.zPos = 0;
 
-            fetchp1.setPos(ref player1, ref sprites, Height, Width);
+            fetch.setPos(ref player1, ref sprites, Height, Width);
 
             // Fetches data from the stored map and implements it into the game
             sprites = data.fetchMap(Height, Width);
@@ -84,7 +86,7 @@ namespace SpriteKitGame
                 for (int j = 0; j < 10; j++)
                 {
                     Debug.WriteLine(sprites[i, j, 0]);
-                    if (sprites[i, j, 0] != null)
+                    if(sprites[i,j,0]!=null)
                     {
                         AddChild(sprites[i, j, 0].spriteNode);
                     }
@@ -122,59 +124,17 @@ namespace SpriteKitGame
             }
         }
 #else
-        private static System.Timers.Timer time;
-        private static System.Timers.Timer time2;
-        private static bool flag = true;
-        private static bool addmove = false;
-
-        public static void displace(Sprite.Entity entity, nfloat unit, int i, int j)
-        {
-            flag = false;
-            addmove = false;
-            time = new System.Timers.Timer();
-            time2 = new System.Timers.Timer();
-            time.Interval = 500 / (entity.Speed);
-            time2.Interval = 500 / (entity.Speed * unit);
-            time.Elapsed += make_true;
-            time2.Elapsed += movetime;
-            time.Enabled = true;
-            time2.Enabled = true;
-            while (!flag)
-            {
-                if (addmove)
-                {
-                    Debug.WriteLine("{0} : {1}", entity.spriteNode.Position, new CGPoint(entity.spriteNode.Position.X + i, entity.spriteNode.Position.Y + j));
-                    entity.spriteNode.Position = new CGPoint(entity.spriteNode.Position.X + i, entity.spriteNode.Position.Y + j);
-                    addmove = false;
-                    time.AutoReset = true;
-                }
-            }
-            flag = true;
-            addmove = false;
-            time.Enabled = false;
-            time.AutoReset = true;
-            time2.Enabled = false;
-        }
-
-        public bool GetFlag()
-        { return flag; }
-
-        private static void make_true(object sender, ElapsedEventArgs e)
-        { flag = true; }
-
-        private static void movetime(object sender, ElapsedEventArgs e)
-        { addmove = true; }
-
         // Move when key is down, and previous movement finished
         public override void KeyDown(NSEvent theEvent)
         {
             // Called when a key is pressed
             base.KeyDown(theEvent);
-            //var change = new CGPoint();
+
             if(move.GetFlag())
             {
+                var change = new CGPoint();
 
-                move.move(ref player1, ref sprites, theEvent, Height, Width, out x, out y);
+                move.move(ref player1, ref sprites, theEvent, ref change, Height, Width);
                 //fetch.Form1_KeyPress()
 
                 sprites[player1.xPos, player1.yPos, player1.zPos] = player1;
@@ -197,21 +157,18 @@ namespace SpriteKitGame
                     Debug.WriteLine("");
                 }
 
-                //var action = SKAction.MoveTo(new CGPoint(player1.spriteNode.Position.X + change.X, player1.spriteNode.Position.Y + change.Y), 0.5);
+                var action = SKAction.MoveTo(new CGPoint(player1.spriteNode.Position.X + change.X, player1.spriteNode.Position.Y + change.Y), 0.5);
 
                 //var action = SKAction.MoveBy(change.X, change.Y, 0.5);
                 //SKAction OutofBounds = SKAction.RemoveFromParent();
-                //player1.spriteNode.RunAction(action);
+                player1.spriteNode.RunAction(action);
             }
+            //AddChild(sprite);
         }
 #endif
         public override void Update(double currentTime)
         {
-            sprites[player1.xPos, player1.yPos, player1.zPos] = null;
-            player1.xPos = Convert.ToInt32((player1.spriteNode.Position.X - ((Width - Height) / 2)) / (Height / 10));
-            player1.yPos = Convert.ToInt32(player1.spriteNode.Position.Y / (Height / 10));
-            sprites[player1.xPos, player1.yPos, player1.zPos] = player1;
-            Debug.WriteLine("{0},{1}", Height / 10, player1.spriteNode.Position.Y);
+            // Called to update the frames
         }
     }
 }
