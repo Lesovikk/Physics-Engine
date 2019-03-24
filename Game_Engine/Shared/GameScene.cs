@@ -7,6 +7,7 @@ using Game_Engine.movement;
 using System.Windows.Input;
 using System.Diagnostics;
 using System.Windows.Forms;
+using System.Timers;
 
 #if __IOS__
 using UIKit;
@@ -33,6 +34,8 @@ namespace SpriteKitGame
         nfloat Width;
         //int accelx;
         //int accely;
+        int x;
+        int y;
 
         protected GameScene(IntPtr handle) : base(handle)
         {
@@ -48,6 +51,8 @@ namespace SpriteKitGame
             bg = SKSpriteNode.FromImageNamed("background/background");
             player1.spriteNode = SKSpriteNode.FromImageNamed(player1.spritef);
             //p1 = SKSpriteNode.FromImageNamed("sprites/player/p1front");
+            x = 0;
+            y = 0;
         }
 
         public override void DidMoveToView(SKView view)
@@ -117,50 +122,96 @@ namespace SpriteKitGame
             }
         }
 #else
+        private static System.Timers.Timer time;
+        private static System.Timers.Timer time2;
+        private static bool flag = true;
+        private static bool addmove = false;
+
+        public static void displace(Sprite.Entity entity, nfloat unit, int i, int j)
+        {
+            flag = false;
+            addmove = false;
+            time = new System.Timers.Timer();
+            time2 = new System.Timers.Timer();
+            time.Interval = 500 / (entity.Speed);
+            time2.Interval = 500 / (entity.Speed * unit);
+            time.Elapsed += make_true;
+            time2.Elapsed += movetime;
+            time.Enabled = true;
+            time2.Enabled = true;
+            while (!flag)
+            {
+                if (addmove)
+                {
+                    Debug.WriteLine("{0} : {1}", entity.spriteNode.Position, new CGPoint(entity.spriteNode.Position.X + i, entity.spriteNode.Position.Y + j));
+                    entity.spriteNode.Position = new CGPoint(entity.spriteNode.Position.X + i, entity.spriteNode.Position.Y + j);
+                    addmove = false;
+                    time.AutoReset = true;
+                }
+            }
+            flag = true;
+            addmove = false;
+            time.Enabled = false;
+            time.AutoReset = true;
+            time2.Enabled = false;
+        }
+
+        public bool GetFlag()
+        { return flag; }
+
+        private static void make_true(object sender, ElapsedEventArgs e)
+        { flag = true; }
+
+        private static void movetime(object sender, ElapsedEventArgs e)
+        { addmove = true; }
+
+        // Move when key is down, and previous movement finished
         public override void KeyDown(NSEvent theEvent)
         {
             // Called when a key is pressed
             base.KeyDown(theEvent);
             //var change = new CGPoint();
-
-            sprites[player1.xPos, player1.yPos, player1.zPos] = null;
-            player1.xPos = Convert.ToInt32((player1.spriteNode.Position.X - (Width - Height) / 2) / (Height / 10));
-            player1.yPos = Convert.ToInt32(player1.spriteNode.Position.Y / (Height / 10));
-            sprites[player1.xPos, player1.yPos, player1.zPos] = player1;
-
-            move.move(ref player1, ref sprites, theEvent, Height, Width);
-            //fetch.Form1_KeyPress()
-
-            sprites[player1.xPos, player1.yPos, player1.zPos] = player1;
-            // Debug
-            Debug.WriteLine("Player1 x: {0}, y: {1}", player1.xPos, player1.yPos);
-            for (int i = 9; i >= 0; i--)
+            if(move.GetFlag())
             {
-                Debug.Write("|");
-                for (int j = 0; j <= 9; j++)
+
+                move.move(ref player1, ref sprites, theEvent, Height, Width, out x, out y);
+                //fetch.Form1_KeyPress()
+
+                sprites[player1.xPos, player1.yPos, player1.zPos] = player1;
+                // Debug
+                Debug.WriteLine("Player1 x: {0}, y: {1}", player1.xPos, player1.yPos);
+                for (int i = 9; i >= 0; i--)
                 {
-                    if (sprites[j, i, player1.zPos] == null)
-                    { Debug.Write("0|"); }
+                    Debug.Write("|");
+                    for (int j = 0; j <= 9; j++)
+                    {
+                        if (sprites[j, i, player1.zPos] == null)
+                        { Debug.Write("0|"); }
 
-                    else if (sprites[j, i, player1.zPos] == player1)
-                    { Debug.Write("p|"); }
+                        else if (sprites[j, i, player1.zPos] == player1)
+                        { Debug.Write("p|"); }
 
-                    else if (sprites[j, i, player1.zPos].Type == "block")
-                    { Debug.Write("b|"); }
+                        else if (sprites[j, i, player1.zPos].Type == "block")
+                        { Debug.Write("b|"); }
+                    }
+                    Debug.WriteLine("");
                 }
-                Debug.WriteLine("");
+
+                //var action = SKAction.MoveTo(new CGPoint(player1.spriteNode.Position.X + change.X, player1.spriteNode.Position.Y + change.Y), 0.5);
+
+                //var action = SKAction.MoveBy(change.X, change.Y, 0.5);
+                //SKAction OutofBounds = SKAction.RemoveFromParent();
+                //player1.spriteNode.RunAction(action);
             }
-
-            //var action = SKAction.MoveTo(new CGPoint(player1.spriteNode.Position.X + change.X, player1.spriteNode.Position.Y + change.Y), 0.5);
-
-            //var action = SKAction.MoveBy(change.X, change.Y, 0.5);
-            //SKAction OutofBounds = SKAction.RemoveFromParent();
-            //player1.spriteNode.RunAction(action);
         }
 #endif
         public override void Update(double currentTime)
         {
-            // Called before each frame is rendered
+            sprites[player1.xPos, player1.yPos, player1.zPos] = null;
+            player1.xPos = Convert.ToInt32((player1.spriteNode.Position.X - ((Width - Height) / 2)) / (Height / 10));
+            player1.yPos = Convert.ToInt32(player1.spriteNode.Position.Y / (Height / 10));
+            sprites[player1.xPos, player1.yPos, player1.zPos] = player1;
+            Debug.WriteLine("{0},{1}", Height / 10, player1.spriteNode.Position.Y);
         }
     }
 }

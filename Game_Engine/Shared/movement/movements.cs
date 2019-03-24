@@ -78,7 +78,7 @@ namespace Game_Engine.movement
         }
 
         // Function to move the player character. 
-        public void move(ref Sprite.Entity player1, ref Sprite[,,] sprites, NSEvent theEvent, nfloat Height, nfloat Width)
+        public void move(ref Sprite.Entity player1, ref Sprite[,,] sprites, NSEvent theEvent, nfloat Height, nfloat Width, out int i, out int j)
         {
             // find direction
             string Direction = direction(theEvent);
@@ -91,20 +91,25 @@ namespace Game_Engine.movement
             {
                 case "right":
                     movement(ref sprites, ref player1, player1.spriter, unit, 1, 0, Height, Width);
+                    i = 1; j = 0;
                     break;
 
                 case "left":
                     movement(ref sprites, ref player1, player1.spritel, unit, -1, 0, Height, Width);
+                    i = -1;j = 0;
                     break;
 
                 case "up":
                     movement(ref sprites, ref player1, player1.spriteb, unit, 0, 1, Height, Width);
+                    i = 0;j = 1;
                     break;
 
                 case "down":
                     movement(ref sprites, ref player1, player1.spritef, unit, 0, -1, Height, Width);
+                    i = 0;j = -1;
                     break;
                 default:
+                    i = 0; j = 0;
                     break;
             }
         }
@@ -144,7 +149,7 @@ namespace Game_Engine.movement
             time = new System.Timers.Timer();
             time2 = new System.Timers.Timer();
             time.Interval = 500 / (entity.Speed);
-            time2.Interval = 500 / (entity.Speed * unit);
+            time2.Interval = 500 / (entity.Speed * 150);
             time.Elapsed += make_true;
             time2.Elapsed += movetime;
             time.Enabled = true;
@@ -153,7 +158,8 @@ namespace Game_Engine.movement
             {
                 if(addmove)
                 {
-                    entity.spriteNode.Position = new CGPoint(entity.spriteNode.Position.X + i, entity.spriteNode.Position.Y + j);
+                    Debug.WriteLine("{0} : {1}", entity.spriteNode.Position, new CGPoint(entity.spriteNode.Position.X + i * (unit / 10), entity.spriteNode.Position.Y + j * (unit / 10)));
+                    entity.spriteNode.Position = new CGPoint(entity.spriteNode.Position.X + i * (unit / 150), entity.spriteNode.Position.Y + j * (unit / 150));
                     addmove = false;
                     time.AutoReset = true;
                 }
@@ -161,6 +167,8 @@ namespace Game_Engine.movement
             flag = true;
             addmove = false;
             time.Enabled = false;
+            time.AutoReset = true;
+            time2.Enabled = false;
         }
 
         public bool GetFlag()
