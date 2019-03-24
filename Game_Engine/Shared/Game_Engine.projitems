@@ -28,5 +28,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)GameScene.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)setup\fetch_data.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)setup\p1_setup.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)movement\movements.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)setup\block_setup%28%29.cs" />
   </ItemGroup>
 </Project>

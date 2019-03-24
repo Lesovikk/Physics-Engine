@@ -3,6 +3,7 @@ using CoreGraphics;
 using Foundation;
 using SpriteKit;
 using Game_Engine.setup;
+using Game_Engine.movement;
 using System.Windows.Input;
 using System.Diagnostics;
 using System.Windows.Forms;
@@ -17,14 +18,13 @@ using AppKit;
 
 namespace SpriteKitGame
 {
-    public class setup1 : p1_setup
-    { }
     public class GameScene : SKScene
     {
 #if __IOS__
 #else
         // Initialising instances of classes present in the game.
-        setup1 fetch;
+        p1_setup fetchp1;
+        movements move;
         fetch_data data;
         Sprite.Entity player1;
         SKSpriteNode bg;
@@ -36,16 +36,17 @@ namespace SpriteKitGame
 
         protected GameScene(IntPtr handle) : base(handle)
         {
-            fetch = new setup1();
+            fetchp1 = new p1_setup();
+            move = new movements();
             data = new fetch_data();
-            player1 = new Sprite.Entity(fetch.p1());
+            player1 = new Sprite.Entity(fetchp1.p1());
             sprites = new Sprite[10, 10, 3];
             //accelx = 0;
             //accely = 0;
             Height = Frame.Size.Height;
             Width = Frame.Size.Width;
             bg = SKSpriteNode.FromImageNamed("background/background");
-            player1.spriteNode = SKSpriteNode.FromImageNamed(player1.spritef);          
+            player1.spriteNode = SKSpriteNode.FromImageNamed(player1.spritef);
             //p1 = SKSpriteNode.FromImageNamed("sprites/player/p1front");
         }
 
@@ -56,7 +57,7 @@ namespace SpriteKitGame
             // test values for position
             player1.xPos = 0; player1.yPos = 0; player1.zPos = 0;
 
-            fetch.setPos(ref player1, ref sprites, Height, Width);
+            fetchp1.setPos(ref player1, ref sprites, Height, Width);
 
             // Fetches data from the stored map and implements it into the game
             sprites = data.fetchMap(Height, Width);
@@ -78,7 +79,7 @@ namespace SpriteKitGame
                 for (int j = 0; j < 10; j++)
                 {
                     Debug.WriteLine(sprites[i, j, 0]);
-                    if(sprites[i,j,0]!=null)
+                    if (sprites[i, j, 0] != null)
                     {
                         AddChild(sprites[i, j, 0].spriteNode);
                     }
@@ -122,7 +123,12 @@ namespace SpriteKitGame
             base.KeyDown(theEvent);
             var change = new CGPoint();
 
-            fetch.move(ref player1, ref sprites, theEvent, ref change, Height, Width);
+            sprites[player1.xPos, player1.yPos, player1.zPos] = null;
+            player1.xPos = Convert.ToInt32((player1.spriteNode.Position.X - (Width - Height) / 2) / (Height / 10));
+            player1.yPos = Convert.ToInt32(player1.spriteNode.Position.Y / (Height / 10));
+            sprites[player1.xPos, player1.yPos, player1.zPos] = player1;
+
+            move.move(ref player1, ref sprites, theEvent, ref change, Height, Width);
             //fetch.Form1_KeyPress()
 
             sprites[player1.xPos, player1.yPos, player1.zPos] = player1;
@@ -146,12 +152,10 @@ namespace SpriteKitGame
             }
 
             var action = SKAction.MoveTo(new CGPoint(player1.spriteNode.Position.X + change.X, player1.spriteNode.Position.Y + change.Y), 0.5);
+
             //var action = SKAction.MoveBy(change.X, change.Y, 0.5);
             //SKAction OutofBounds = SKAction.RemoveFromParent();
-
             player1.spriteNode.RunAction(action);
-            //AddChild(sprite);
-
         }
 #endif
         public override void Update(double currentTime)

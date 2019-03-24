@@ -191,7 +191,7 @@ namespace Game_Engine.setup
 
         public Sprite[,,] fetchMap(nfloat Height, nfloat Width)
         {
-            p1_setup setup = new p1_setup();
+            block_setup setup = new block_setup();
             Sprite[,,] sprites = new Sprite[10,10,3];
             StreamReader map1 = null;
 
