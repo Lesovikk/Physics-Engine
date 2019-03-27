@@ -95,35 +95,14 @@ namespace Game_Engine.setup
         public fetch_data()
         {
         }
-        /*
-        public struct g_values
-        {
-            String ID;
-            String Name;
-            bool Solid;
-            String Type;
-            int defaultZ;
-        }
 
-        public struct e_values
-        {
-            String ID;
-            int Max_Speed;
-            int Health;
-            int Strength;
-        }
-
-        public struct b_values
-        {
-            String ID;
-            bool Climbable;
-            int height;
-            bool Traversable;
-        }
-        */
         // Paths to get to the resource tables
         static string location = Directory.GetCurrentDirectory();
         string path_g = Directory.GetParent(location).Parent.Parent.Parent.Parent.Parent + "/Shared/Resources/tables/";
+
+        // Public function in case an outside class needs to access the directory
+        public string Get_path_g()
+        { return path_g; }
 
         // Function to fetch values from the tables
         public Sprite Fetch(string ID, out Sprite.Entity fetch1, out Sprite.Block fetch2)
@@ -154,6 +133,7 @@ namespace Game_Engine.setup
                 { found = true; temp.ID = data[0]; temp.Name = data[1]; temp.Solid = bool.Parse(data[2]); temp.Type = data[3]; temp.defaultZ = int.Parse(data[4]); temp.path = data[5]; temp.yShift = Convert.ToDouble(data[6]); temp.spriteh = int.Parse(data[7]); }
             }
             found = false;
+            sprites.Close();
 
             // Checks the type of the sprite whose value was fetched and sets up a corresponding sprite.entity or sprite.block
             switch (temp.Type)
@@ -168,6 +148,8 @@ namespace Game_Engine.setup
                         { found = true; fetch1.Max_Speed = int.Parse(data[1]); fetch1.Base_Speed = int.Parse(data[2]); fetch1.Acceleration = int.Parse(data[3]); fetch1.Health = int.Parse(data[4]); fetch1.Strength = int.Parse(data[5]); }
                     }
                     fetch2 = new Sprite.Block();
+                    entities.Close();
+                    blocks.Close();
                     return temp;
 
                 case "block":
@@ -180,6 +162,8 @@ namespace Game_Engine.setup
                         { found = true; fetch2.Climbable = Convert.ToBoolean(int.Parse(data[1])); fetch2.height = int.Parse(data[2]); fetch2.Traversable = Convert.ToBoolean(int.Parse(data[3])); }
                     }
                     fetch1 = new Sprite.Entity();
+                    entities.Close();
+                    blocks.Close();
                     return temp;
 
                 default:
@@ -187,13 +171,20 @@ namespace Game_Engine.setup
                     fetch1.ID = temp.ID; fetch1.Name = temp.Name; fetch1.Solid = temp.Solid; fetch1.Type = temp.Type; fetch1.defaultZ = temp.defaultZ;
                     fetch2 = new Sprite.Block();
                     fetch2.ID = temp.ID; fetch2.Name = temp.Name; fetch2.Solid = temp.Solid; fetch2.Type = temp.Type; fetch2.defaultZ = temp.defaultZ;
+                    entities.Close();
+                    blocks.Close();
                     return temp;
             }
         }
 
+        // Path to maps directory
         string path_map = Directory.GetParent(location).Parent.Parent.Parent.Parent.Parent + "/Shared/Resources/maps/";
 
-        public Sprite[,,] fetchMap(nfloat Height, nfloat Width)
+        // Public function so that the maps directory can be used to access the maps directory without re-using code
+        public string Get_path_map() { return path_map; }
+
+        // Fetches a map file and imports it into a 3 dimensional array
+        public Sprite[,,] fetchMap(nfloat Height, nfloat Width, string mapID)
         {
             block_setup setup = new block_setup();
             Sprite[,,] sprites = new Sprite[10,10,3];
@@ -201,12 +192,12 @@ namespace Game_Engine.setup
 
             try
             {
-                map1 = new StreamReader(path_map + "map1.csv");
+                map1 = new StreamReader(path_map + mapID + ".csv");
                 Debug.WriteLine("No error for map path");
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex);
+                Debug.WriteLine("Error whilst trying to access map: {0}", ex);
             }
 
             string[] row;
@@ -221,12 +212,125 @@ namespace Game_Engine.setup
                         Sprite.Block block = new Sprite.Block(setup.b(row[x]));
                         block.xPos = x; block.yPos = y; block.zPos = 0;
                         block.spriteNode = SKSpriteNode.FromImageNamed(block.path);
-                        Debug.WriteLine("{0},{1}", Height, Width);
                         setup.setPos(ref block, ref sprites, Height, Width);
                     }
                 }
             }
+            map1.Close();
+            return sprites;
+        }
 
+        public Sprite[,,] fetchMap(string mapID)
+        {
+            block_setup setup = new block_setup();
+            Sprite[,,] sprites = new Sprite[10, 10, 3];
+            StreamReader map1 = null;
+
+            try
+            {
+                map1 = new StreamReader(path_map + mapID + ".csv");
+                Debug.WriteLine("No error for map path");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error whilst trying to access map: {0}", ex);
+            }
+
+            string[] row;
+
+            for (int y = 9; y >= 0; y--)
+            {
+                row = map1.ReadLine().Split(',');
+                for (int x = 0; x < row.Length; x++)
+                {
+                    if (row[x] != "0")
+                    {
+                        Sprite.Block block = new Sprite.Block(setup.b(row[x]));
+                        block.xPos = x; block.yPos = y; block.zPos = 0;
+                        sprites[x, y, 0] = block;
+                    }
+                }
+            }
+            map1.Close();
+            return sprites;
+        }
+
+        public void Add_map(Sprite[,,] sprites)
+        {
+            string[] mapsreader = null;
+            StreamWriter mapswriter = null;
+
+            try
+            {
+                mapsreader = File.ReadAllLines(path_map + "maps.csv");
+                mapswriter = File.AppendText(path_map + "maps.csv");
+                Debug.WriteLine("No error accessing maps.csv for writing");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Failed to access maps.csv directory: {0}", ex);
+            }
+
+            try
+            {
+                int map_ID = int.Parse(mapsreader[0].Split(',')[0]) + 1;
+
+                for (int y = 0; y < sprites.GetLength(0); y++)
+                {
+                    for (int x = 0; x < sprites.GetLength(1); x++)
+                    {
+                        if (sprites[x, y, 0] != null)
+                        { mapswriter.WriteLine("{0},{1},{2},{3}", map_ID, sprites[x, y, 0].xPos, sprites[x, y, 0].yPos, sprites[x, y, 0].ID); }
+                    }
+                }
+                Debug.WriteLine("Added map to the table without issue");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Failed to add map to table: {0}", ex);
+            }
+            mapswriter.Close();
+        }
+
+        public Sprite[,,] Getmap(nfloat Height, nfloat Width, int mapnum)
+        {
+            block_setup setup = new block_setup();
+            Sprite[,,] sprites = new Sprite[10, 10, 3];
+            StreamReader maps = null;
+
+            try
+            {
+                maps = new StreamReader(path_map + "maps.csv");
+                Debug.WriteLine("No error for map path");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Failed to access maps directory: {0}",ex);
+            }
+
+            string[] row;
+
+            try
+            {
+                do
+                {
+                    row = maps.ReadLine().Split(',');
+                    if (int.Parse(row[0]) == mapnum)
+                    {
+                        Sprite.Block block = new Sprite.Block(setup.b(row[3]));
+                        block.xPos = int.Parse(row[1]); block.yPos = int.Parse(row[2]); block.zPos = 0;
+                        block.spriteNode = SKSpriteNode.FromImageNamed(block.path);
+                        setup.setPos(ref block, ref sprites, Height, Width);
+                    }
+                }
+                while (int.Parse(row[0]) <= mapnum);
+                Debug.WriteLine("Fetched map from maps table without problem");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Failed to fetch from maps table: {0}",ex);
+            }
+            maps.Close();
             return sprites;
         }
     }
