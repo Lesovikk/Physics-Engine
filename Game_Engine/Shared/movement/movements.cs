@@ -106,7 +106,7 @@ namespace Game_Engine.movement
         }
 
         // Function to move the player character. 
-        public void move(ref Sprite.Entity player1, ref Sprite[,,] sprites, NSEvent theEvent, ref CGPoint change, nfloat Height, nfloat Width)
+        public bool move(ref Sprite.Entity player1, ref Sprite[,,] sprites, NSEvent theEvent, ref CGPoint change, nfloat Height, nfloat Width)
         {
             // find direction
             string Direction = direction(theEvent);
@@ -115,15 +115,18 @@ namespace Game_Engine.movement
             nfloat unit = (nfloat)(3.75 * Height / 150);
 
             // Acceleration
-            Debug.WriteLine("Prev.Speed: {0}", player1.Speed);
-            Debug.WriteLine("Max Speed: {0}", player1.Max_Speed);
-            Debug.WriteLine("{0},{1},{2}", player1.last_direction, Direction, player1.last_direction == Direction);
-            if (player1.last_direction == Direction && player1.Speed<=player1.Max_Speed)
+            if(player1.Type=="entity")
             {
-                player1.Speed += 0.1 * (double)(player1.Acceleration);
-                player1.last_direction = Direction;
+                Debug.WriteLine("Prev.Speed: {0}", player1.Speed);
+                Debug.WriteLine("Max Speed: {0}", player1.Max_Speed);
+                Debug.WriteLine("{0},{1},{2}", player1.last_direction, Direction, player1.last_direction == Direction);
+                if (player1.last_direction == Direction && player1.Speed<=player1.Max_Speed)
+                {
+                    player1.Speed += 0.1 * (double)(player1.Acceleration);
+                    player1.last_direction = Direction;
+                }
+                else if(player1.last_direction!=Direction){ player1.Speed = player1.Base_Speed; player1.last_direction = Direction; }
             }
-            else if(player1.last_direction!=Direction){ player1.Speed = player1.Base_Speed; player1.last_direction = Direction; }
 
             Debug.WriteLine("Speed: {0}",player1.Speed);
             // Move around player1 and sets previous position to null
@@ -147,6 +150,11 @@ namespace Game_Engine.movement
                 default:
                     break;
             }
+            if (change.X == 0 & change.Y == 0)
+            {
+                return true;
+            }
+            else { return false; }
         }
 
         private static System.Timers.Timer time;
