@@ -130,7 +130,7 @@ namespace SpriteKitGame
             {
                 var change = new CGPoint();
 
-                move.move(ref player1, ref sprites, theEvent, ref change, Height, Width);
+                bool collide = move.move(ref player1, ref sprites, theEvent, ref change, Height, Width);
                 //fetch.Form1_KeyPress()
 
                 sprites[player1.xPos, player1.yPos, player1.zPos] = player1;
