@@ -60,8 +60,10 @@ namespace Game_Engine.movement
             player1.spriteNode.Texture = SKTexture.FromImageNamed(sprite);
             int x = (int)((player1.actualX + i * 4) / 15);
             int y = (int)((player1.actualY + j * 4) / 15);
-            Debug.WriteLine("{0},{1}", player1.actualX, player1.actualY);
-            Debug.WriteLine("{0},{1}", x, y);
+            Debug.WriteLine("Current pos: {0},{1}", player1.actualX, player1.actualY);
+            Debug.WriteLine("Checker pos: {0},{1}", player1.actualX + 4 * i, player1.actualY + 4 * j);
+            Debug.WriteLine("Destination: {0},{1}", player1.actualX + i * (3.75), player1.actualY + j * (3.75));
+            Debug.WriteLine("Change: {0},{1}", x, y);
             sprites[player1.xPos, player1.yPos, player1.zPos] = null;
             // Checks if move is out of bounds
             if ((0 > player1.actualX + 4 * i | player1.actualX + 4 * i >= 15 * sprites.GetLength(0)) | (0 > player1.actualY + 4 * j | player1.actualY + 4 * j >= 15 * sprites.GetLength(1)))
@@ -75,7 +77,6 @@ namespace Game_Engine.movement
                 Debug.WriteLine("Moved in desired direction");
                 player1.actualX += 3.75*i; player1.xPos = (int)(player1.actualX / 15); change.X = i * unit;
                 player1.actualY += 3.75*j; player1.yPos = (int)(player1.actualY / 15); change.Y = j * unit;
-                if (player1.zPos > 0) { player1.spriteNode.ZPosition = sprites[player1.xPos, player1.yPos, player1.zPos - 1].spriteNode.ZPosition + 2; }
             }
 
             // Moves a player in the desired direction and falls
@@ -88,21 +89,19 @@ namespace Game_Engine.movement
                 {
                     player1.zPos--; player1.spriteNode.Position = new CGPoint(player1.spriteNode.Position.X, player1.spriteNode.Position.Y - (4 * Height / 150));
                 }
-                if (player1.zPos > 0) { player1.spriteNode.ZPosition = sprites[player1.xPos, player1.yPos, player1.zPos - 1].spriteNode.ZPosition + 2; }
-                else { player1.spriteNode.ZPosition = player1.defaultZ + (9 - player1.yPos); }
             }
 
             // Moves player 1 up a floor whilst moving in the desired direction
             else if (sprites[x, y, player1.zPos].GetClimbable() && sprites[x, y, player1.zPos].GetHeight() - player1.zPos == 1)
             {
                 Debug.WriteLine("Moved in desired direction and climbed");
-                player1.spriteNode.ZPosition = sprites[player1.xPos + i, player1.yPos + j, player1.zPos].spriteNode.ZPosition + 2;
                 player1.spriteNode.Position = new CGPoint(player1.spriteNode.Position.X, player1.spriteNode.Position.Y + (4 * Height / 150)); ;
                 player1.actualX += 3.75 * 2 * i; player1.xPos = (int)(player1.actualX / 15); change.X = 2 * i * unit;
                 player1.actualY += 3.75 * 2 * j; player1.yPos = (int)(player1.actualY / 15); change.Y = 2 * j * unit;
                 player1.zPos++;
             }
             else { Debug.WriteLine("Error"); }
+            player1.spriteNode.ZPosition = 4 * (player1.defaultZ + (9 - player1.yPos)) + 2 * (player1.zPos);
         }
 
         // Function to move the player character. 
