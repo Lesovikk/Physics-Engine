@@ -34,9 +34,6 @@ namespace SpriteKitGame
         Sprite[,,] sprites;
         nfloat Height;
         nfloat Width;
-        //int accelx;
-        //int accely;
-
 
         protected GameScene(IntPtr handle) : base(handle)
         {
@@ -63,7 +60,8 @@ namespace SpriteKitGame
             fetch.setPos(ref player1, ref sprites, Height, Width);
 
             // Fetches data from the stored map and implements it into the game
-            sprites = data.fetchMap(Height, Width, "map1");
+            sprites = data.Getmap(Height, Width, 3);
+            //sprites = data.fetchMap(Height, Width, "map1");
             player1.spriteNode.ZPosition = 1;
 
             BackgroundColor = NSColor.Black;
@@ -182,7 +180,7 @@ namespace SpriteKitGame
 #endif
         public override void Update(double currentTime)
         {
-            // Called to update the frames
+            // Called before each frame is updated
         }
     }
 }

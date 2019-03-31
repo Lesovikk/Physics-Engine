@@ -183,7 +183,7 @@ namespace Game_Engine.setup
         // Public function so that the maps directory can be used to access the maps directory without re-using code
         public string Get_path_map() { return path_map; }
 
-        // Fetches a map file and imports it into a 3 dimensional array
+        // Fetches a map file and imports it into a 3 dimensional array while instantiating the values
         public Sprite[,,] fetchMap(nfloat Height, nfloat Width, string mapID)
         {
             block_setup setup = new block_setup();
@@ -220,6 +220,7 @@ namespace Game_Engine.setup
             return sprites;
         }
 
+        // Fetches a map from a map file and imports it into a 3 dimensional array
         public Sprite[,,] fetchMap(string mapID)
         {
             block_setup setup = new block_setup();
@@ -255,6 +256,7 @@ namespace Game_Engine.setup
             return sprites;
         }
 
+        // Adds the map to the map database
         public void Add_map(Sprite[,,] sprites)
         {
             string[] mapsreader = null;
@@ -292,6 +294,7 @@ namespace Game_Engine.setup
             mapswriter.Close();
         }
 
+        // Gets the map from the table and returns it in a Sprite array
         public Sprite[,,] Getmap(nfloat Height, nfloat Width, int mapnum)
         {
             block_setup setup = new block_setup();
@@ -309,13 +312,13 @@ namespace Game_Engine.setup
             }
 
             string[] row;
-
+            maps.ReadLine();
             try
             {
                 do
                 {
                     row = maps.ReadLine().Split(',');
-                    if (int.Parse(row[0]) == mapnum)
+                    if (int.TryParse(row[0],out int z) && int.Parse(row[0]) == mapnum)
                     {
                         Sprite.Block block = new Sprite.Block(setup.b(row[3]));
                         block.xPos = int.Parse(row[1]); block.yPos = int.Parse(row[2]); block.zPos = 0;

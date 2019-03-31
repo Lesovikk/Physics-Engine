@@ -69,7 +69,7 @@ namespace SpriteKitGame
             //var sprite = SKSpriteNode.FromImageNamed(NSBundle.MainBundle.PathForResource("Spaceship", "png"));
 
             sprite.Position = location;
-            sprite.SetScale(0.5f);
+            sprite.SetScale(10);
 
             var action = SKAction.MoveBy(2, 2, 0.1);
 
