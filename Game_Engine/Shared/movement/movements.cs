@@ -101,7 +101,7 @@ namespace Game_Engine.movement
                 player1.zPos++;
             }
             else { Debug.WriteLine("Error"); }
-            player1.spriteNode.ZPosition = player1.defaultZ + 4 * (9 - player1.yPos) + 2 * (player1.zPos);
+            player1.spriteNode.ZPosition = player1.defaultZ + 4 * (9 - (int)((player1.actualY) / 15)) + 6 * (player1.zPos) - 1;
         }
 
         // Function to move the player character. 

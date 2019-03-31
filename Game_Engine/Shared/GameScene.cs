@@ -34,6 +34,8 @@ namespace SpriteKitGame
         Sprite[,,] sprites;
         nfloat Height;
         nfloat Width;
+        SKAction action;
+        bool Nextmove;
 
         protected GameScene(IntPtr handle) : base(handle)
         {
@@ -42,12 +44,13 @@ namespace SpriteKitGame
             move = new movements();
             player1 = new Sprite.Entity(fetch.p1());
             sprites = new Sprite[10, 10, 3];
+            Nextmove = false;
             //accelx = 0;
             //accely = 0;
             Height = Frame.Size.Height;
             Width = Frame.Size.Width;
             bg = SKSpriteNode.FromImageNamed("background/background");
-            player1.spriteNode = SKSpriteNode.FromImageNamed(player1.spritef);          
+            player1.spriteNode = SKSpriteNode.FromImageNamed(player1.spritef);
             //p1 = SKSpriteNode.FromImageNamed("sprites/player/p1front");
         }
 
@@ -80,7 +83,7 @@ namespace SpriteKitGame
                 for (int j = 0; j < 10; j++)
                 {
                     Debug.WriteLine(sprites[i, j, 0]);
-                    if(sprites[i,j,0]!=null)
+                    if (sprites[i, j, 0] != null)
                     {
                         AddChild(sprites[i, j, 0].spriteNode);
                     }
@@ -124,7 +127,7 @@ namespace SpriteKitGame
             // Called when a key is pressed
             base.KeyDown(theEvent);
 
-            if(GetFlag(player1))
+            if (GetFlag(player1) || GetNear(player1))
             {
                 var change = new CGPoint();
 
@@ -151,12 +154,19 @@ namespace SpriteKitGame
                     Debug.WriteLine("");
                 }
 
-                var action = SKAction.MoveTo(new CGPoint(player1.spriteNode.Position.X + change.X, player1.spriteNode.Position.Y + change.Y), 0.5 / (player1.Speed));
-                player1.destination = new CGPoint(player1.spriteNode.Position.X + change.X, player1.spriteNode.Position.Y + change.Y);
-                var sequence = SKAction.Sequence(action);
-                //var action = SKAction.MoveBy(change.X, change.Y, 0.5);
-                //SKAction OutofBounds = SKAction.RemoveFromParent();
-                player1.spriteNode.RunAction(action);
+
+                if (GetFlag(player1))
+                {
+                    action = SKAction.MoveTo(new CGPoint(player1.spriteNode.Position.X + change.X, player1.spriteNode.Position.Y + change.Y), 0.5 / (player1.Speed));
+                    player1.destination = new CGPoint(player1.spriteNode.Position.X + change.X, player1.spriteNode.Position.Y + change.Y);
+                    player1.spriteNode.RunAction(action);
+                }
+                else
+                {
+                    Nextmove = true;
+                    player1.destination = new CGPoint(player1.destination.X + change.X, player1.destination.Y + change.Y);
+                    action = SKAction.MoveTo(player1.destination, 0.5 / (player1.Speed));
+                }
             }
             //AddChild(sprite);
         }
@@ -171,9 +181,9 @@ namespace SpriteKitGame
         }
         public bool GetNear(Sprite.Entity entity)
         {
-            if (Math.Sqrt(Math.Pow(player1.spriteNode.Position.X - player1.destination.X, 2)) <= 0.1 && (player1.last_direction == "left" || player1.last_direction == "right"))
+            if (Math.Sqrt(Math.Pow(player1.spriteNode.Position.X - player1.destination.X, 2)) <= 2 && (player1.last_direction == "left" || player1.last_direction == "right"))
                 { return true; }
-            else if (Math.Sqrt(Math.Pow(player1.spriteNode.Position.Y - player1.destination.Y, 2)) <= 0.1 && (player1.last_direction == "up" || player1.last_direction == "down"))
+            else if (Math.Sqrt(Math.Pow(player1.spriteNode.Position.Y - player1.destination.Y, 2)) <= 2 && (player1.last_direction == "up" || player1.last_direction == "down"))
                 { return true; }
             else { return false; }
         }
@@ -181,6 +191,11 @@ namespace SpriteKitGame
         public override void Update(double currentTime)
         {
             // Called before each frame is updated
+            if (GetFlag(player1) && Nextmove)
+            {
+                player1.spriteNode.RunAction(action);
+                Nextmove = false;
+            }
         }
     }
 }

@@ -45,7 +45,7 @@ namespace Game_Engine.setup
                 {
                     sprites[sprite.xPos, sprite.yPos, i] = sprite;
                 }
-                sprite.spriteNode.ZPosition = sprite.defaultZ + 4 * (9 - sprite.yPos) + 2 * (sprite.height - 1);
+                sprite.spriteNode.ZPosition = sprite.defaultZ + 4 * (9 - sprite.yPos) + 3 * (sprite.height - 1);
                 sprite.spriteNode.Size = new CGSize(Height / 10, (Height * sprite.spriteh) / 150);
                 Debug.WriteLine("no error setting position");
             }
