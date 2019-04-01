@@ -275,8 +275,8 @@ namespace Game_Engine.setup
 
             try
             {
-                int map_ID = int.Parse(mapsreader[0].Split(',')[0]) + 1;
-
+                mapswriter.WriteLine("");
+                int map_ID = int.Parse(mapsreader[mapsreader.GetLength(0) - 1].Split(',')[0]) + 1;
                 for (int y = 0; y < sprites.GetLength(0); y++)
                 {
                     for (int x = 0; x < sprites.GetLength(1); x++)

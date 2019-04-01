@@ -102,6 +102,7 @@ namespace Game_Engine.movement
             }
             else { Debug.WriteLine("Error"); }
             player1.spriteNode.ZPosition = player1.defaultZ + 4 * (9 - (int)((player1.actualY) / 15)) + 6 * (player1.zPos) - 1;
+            Debug.WriteLine("Current height: {0}", player1.zPos);
         }
 
         // Function to move the player character. 

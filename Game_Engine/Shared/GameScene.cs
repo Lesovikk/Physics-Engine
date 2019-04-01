@@ -62,6 +62,8 @@ namespace SpriteKitGame
             player1.xPos = 0; player1.yPos = 0; player1.zPos = 0;
             fetch.setPos(ref player1, ref sprites, Height, Width);
 
+            sprites = data.fetchMap("map4");
+            data.Add_map(sprites);
             // Fetches data from the stored map and implements it into the game
             sprites = data.Getmap(Height, Width, 3);
             //sprites = data.fetchMap(Height, Width, "map1");
